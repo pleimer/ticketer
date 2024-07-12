@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  postgres:
+    image: matthieuberger/postgres-multi-db:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./tmp/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=platform
+
+  temporal:
+    restart: on-failure:3 
+    build:
+      context: ./temporal
+      dockerfile: Dockerfile
+    ports:
+      - 7233:7233
+      - 8233:8233
+    volumes:
+      - ./tmp/teamporal:/usr/temporal/
+
+  # API service
+  # api: ...
+
+  # Email worker service
+  # email-worker:...
+
+networks:
+  default:
+    driver: bridge
+    name: mentium-net
