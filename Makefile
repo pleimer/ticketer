@@ -1,13 +1,15 @@
 hot-ui:
 	npx vite ui/ --open
 
-# Default target is "build"
 all: build
 
-# Build target compiles your Go source files into a single executable binary
-build: main.go
-	go build -o ticketer server/cmd/main.go
+build: 
+	go build -o ticketer ./server
 
-# Run target builds and then runs the binary
 run: 
-	cd server && go run main.go
+	go run ./server start
+
+gen-clients:
+	npx orval --input ./internal/api/api.yaml --output ./ui/src/model
+
+gen: gen-clients
