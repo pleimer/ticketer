@@ -1,6 +1,5 @@
 .vscode
 
-
 # Logs
 ui/logs
 ui/*.log
@@ -25,3 +24,6 @@ ui/*.ntvs*
 ui/*.njsproj
 ui/*.sln
 ui/*.sw?
+
+# codegen
+ui/src/model
