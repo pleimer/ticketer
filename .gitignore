@@ -26,4 +26,5 @@ ui/*.sln
 ui/*.sw?
 
 # codegen
-ui/src/model
+ui/src/models
+ui/src/clients

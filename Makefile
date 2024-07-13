@@ -10,6 +10,6 @@ run:
 	go run ./server start
 
 gen-clients:
-	npx orval --input ./internal/api/api.yaml --output ./ui/src/model
+	npx orval --config ./internal/api/orval.config.js
 
 gen: gen-clients
