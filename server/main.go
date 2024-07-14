@@ -6,7 +6,8 @@ import (
 )
 
 type Server struct {
-	cmd.Start `command:"start"`
+	cmd.Start   `command:"start"`
+	cmd.Migrate `command:"migrate"`
 }
 
 func main() {

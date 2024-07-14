@@ -10,7 +10,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_MULTIPLE_DATABASES=platform
+      - POSTGRES_MULTIPLE_DATABASES=ticketerdb
 
   temporal:
     restart: on-failure:3 

@@ -14,7 +14,7 @@ function Copyright() {
       {new Date().getFullYear()}.
     </Typography>
   );
-}
+  }
 
 export default function App() {
   return (

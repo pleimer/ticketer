@@ -5,6 +5,7 @@ info:
   description: API for managing support tickets
 
 paths:
+
   /tickets:
     post:
       summary: Create a new ticket
@@ -23,6 +24,30 @@ paths:
                 $ref: '#/components/schemas/Ticket'
         '400':
           description: Bad request
+  
+  /tickets/{ticketId}:
+    get:
+      summary: Get ticket
+      description: Get resources associated with a specific ticket ID
+      operationId: getTicket
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          description: Unique identifier of the ticket
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: Ticket not found
+        '500':
+          description: Internal server error
 
   /tickets/{ticketId}/status:
     put:

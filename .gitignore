@@ -28,3 +28,14 @@ ui/*.sw?
 # codegen
 ui/src/models
 ui/src/clients
+
+# ent codegen
+server/ent/*
+
+!server/ent/generate.go
+!server/ent/schema
+
+# infra
+infra/tmp
+
+
