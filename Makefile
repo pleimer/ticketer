@@ -5,7 +5,7 @@ build:
 
 # dev
 run-local: 
-	go run ./server start --user=postgres --password=password
+	source .env && go run ./server start --user=postgres --password=password
 
 hot-ui:
 	npx vite ui/ --open

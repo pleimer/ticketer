@@ -13,12 +13,12 @@ import (
 )
 
 type DBConnectionConfig struct {
-	Host     string `short:"h" long:"host" env:"DB_HOST" default:"localhost" description:"Database host"`
-	Port     int    `short:"p" long:"port" env:"DB_PORT" default:"5432" description:"Database port"`
-	User     string `short:"u" long:"user" env:"DB_USER" required:"true" description:"Database user"`
-	DBName   string `short:"d" long:"dbname" env:"DB_NAME" default:"ticketerdb" description:"Database name"`
-	Password string `long:"password" env:"DB_PASSWORD" required:"true" description:"Database password"`
-	SSLMode  string `long:"sslmode" env:"DB_SSLMODE" default:"disable" description:"SSL mode (disable, require, verify-ca, verify-full)"`
+	Host     string `short:"h" long:"host" env:"TICKETER_DB_HOST" default:"localhost" description:"Database host"`
+	Port     int    `short:"p" long:"port" env:"TICKETER_DB_PORT" default:"5432" description:"Database port"`
+	User     string `short:"u" long:"user" env:"TICKETER_DB_USER" required:"true" description:"Database user"`
+	DBName   string `short:"d" long:"dbname" env:"TICKETER_DB_NAME" default:"ticketerdb" description:"Database name"`
+	Password string `long:"password" env:"TICKETER_DB_PASSWORD" required:"true" description:"Database password"`
+	SSLMode  string `long:"sslmode" env:"TICKETER_DB_SSLMODE" default:"disable" description:"SSL mode (disable, require, verify-ca, verify-full)"`
 }
 
 // PGConnectionURL returns a formatted postgres connection URL

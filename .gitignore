@@ -38,4 +38,5 @@ server/ent/*
 # infra
 infra/tmp
 
-
+# secrets
+.env

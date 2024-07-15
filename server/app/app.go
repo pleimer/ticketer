@@ -4,25 +4,27 @@ import (
 	"github.com/pleimer/ticketer/server/lib/once"
 )
 
-// App contains all application singletons and lazy loads the dependancy tree
-var App func() *app
+// Env contains all application singletons and lazy loads the dependancy tree
+var App func() *Env
 
-type app struct {
+type Env struct {
 	*loggerConfig
 	*dbConfig
 	*repositoriesConfig
 	*servicesConfig
 	*routerConfig
+	*integrationsConfig
 }
 
 func init() {
-	var a *app
+	var e *Env
 
 	loggerConfig := loggerConfig{}
 	dbConfig := dbConfig{}
 	repositoriesConfig := repositoriesConfig{}
 	servicesConfig := servicesConfig{}
 	routerConfig := routerConfig{}
+	integrationsConfig := integrationsConfig{}
 
 	// setup the singleton dependancy tree
 	loggerConfig.init()
@@ -30,11 +32,12 @@ func init() {
 	repositoriesConfig.init(&dbConfig)
 	servicesConfig.init(&loggerConfig, &repositoriesConfig)
 	routerConfig.init(&loggerConfig, &servicesConfig)
+	integrationsConfig.init(&loggerConfig)
 
-	App = func() *app {
+	App = func() *Env {
 		once.Once(func() {
-			a = &app{&loggerConfig, &dbConfig, &repositoriesConfig, &servicesConfig, &routerConfig}
+			e = &Env{&loggerConfig, &dbConfig, &repositoriesConfig, &servicesConfig, &routerConfig, &integrationsConfig}
 		})
-		return a
+		return e
 	}
 }
