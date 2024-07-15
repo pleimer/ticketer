@@ -13,8 +13,6 @@ type Start struct {
 
 func (s *Start) Execute(args []string) error {
 
-	// routes
-
 	app.App().DB().Open(s.DBConnectionConfig)
 	defer app.App().DB().Close()
 
