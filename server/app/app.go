@@ -1,15 +1,14 @@
 package app
 
 import (
-	"sync"
+	"fmt"
 
 	"github.com/pleimer/ticketer/server/db"
+	"github.com/pleimer/ticketer/server/lib/once"
 	"github.com/pleimer/ticketer/server/repositories"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
-
-var once sync.Once
 
 var App func() *app
 
@@ -20,6 +19,7 @@ type app struct {
 }
 
 func init() {
+	var a *app
 
 	loggerConfig := loggerConfig{}
 	dbConfig := dbConfig{}
@@ -30,7 +30,12 @@ func init() {
 	dbConfig.init(&loggerConfig)
 	repositoriesConfig.init(&dbConfig)
 
-	App = func() *app { return &app{&loggerConfig, &dbConfig, &repositoriesConfig} }
+	App = func() *app {
+		once.Once(func() {
+			a = &app{&loggerConfig, &dbConfig, &repositoriesConfig}
+		})
+		return a
+	}
 }
 
 type loggerConfig struct {
@@ -41,7 +46,8 @@ type loggerConfig struct {
 func (l *loggerConfig) init() {
 	l.Logger = func() *zap.Logger {
 
-		once.Do(func() {
+		once.Once(func() {
+			fmt.Println("initialized logger")
 			config := zap.Config{
 				Encoding:         "json",
 				Level:            zap.NewAtomicLevelAt(zapcore.InfoLevel),
@@ -77,7 +83,8 @@ type dbConfig struct {
 
 func (d *dbConfig) init(loggerConfig *loggerConfig) {
 	d.DB = func() *db.DB {
-		once.Do(func() {
+		once.Once(func() {
+			fmt.Println("initialized db")
 			d.db = db.NewDB(
 				loggerConfig.Logger(),
 			)
@@ -93,7 +100,7 @@ type repositoriesConfig struct {
 
 func (r *repositoriesConfig) init(dbConfig *dbConfig) {
 	r.TicketsRepository = func() *repositories.TicketsRepository {
-		once.Do(func() {
+		once.Once(func() {
 			r.ticketsRepository = repositories.NewTicketsRepository(
 				dbConfig.DB(),
 			)
