@@ -14,7 +14,7 @@ type routerConfig struct {
 	Router func() *echo.Echo
 }
 
-func (r *routerConfig) init(loggerConfig *loggerConfig) {
+func (r *routerConfig) init(loggerConfig *loggerConfig, servicesConfig *servicesConfig) {
 	r.Router = func() *echo.Echo {
 		once.Once(func() {
 
@@ -24,8 +24,6 @@ func (r *routerConfig) init(loggerConfig *loggerConfig) {
 			}
 
 			swagger.Servers = nil
-
-			ticketsService := services.NewTickets()
 
 			r.router = echo.New()
 
@@ -45,7 +43,7 @@ func (r *routerConfig) init(loggerConfig *loggerConfig) {
 			// might as well validate the requests agains the schema
 			r.router.Use(middleware.OapiRequestValidator(swagger))
 
-			services.RegisterHandlers(r.router, ticketsService)
+			services.RegisterHandlers(r.router, servicesConfig.TicketsService())
 
 		})
 		return r.router

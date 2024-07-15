@@ -11,6 +11,7 @@ type app struct {
 	*loggerConfig
 	*dbConfig
 	*repositoriesConfig
+	*servicesConfig
 	*routerConfig
 }
 
@@ -20,17 +21,19 @@ func init() {
 	loggerConfig := loggerConfig{}
 	dbConfig := dbConfig{}
 	repositoriesConfig := repositoriesConfig{}
+	servicesConfig := servicesConfig{}
 	routerConfig := routerConfig{}
 
 	// setup the singleton dependancy tree
 	loggerConfig.init()
 	dbConfig.init(&loggerConfig)
 	repositoriesConfig.init(&dbConfig)
-	routerConfig.init(&loggerConfig)
+	servicesConfig.init(&loggerConfig, &repositoriesConfig)
+	routerConfig.init(&loggerConfig, &servicesConfig)
 
 	App = func() *app {
 		once.Once(func() {
-			a = &app{&loggerConfig, &dbConfig, &repositoriesConfig, &routerConfig}
+			a = &app{&loggerConfig, &dbConfig, &repositoriesConfig, &servicesConfig, &routerConfig}
 		})
 		return a
 	}
