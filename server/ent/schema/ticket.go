@@ -1,6 +1,9 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // Ticket holds the schema definition for the Ticket entity.
 type Ticket struct {
@@ -9,7 +12,10 @@ type Ticket struct {
 
 // Fields of the Ticket.
 func (Ticket) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Int("status"),
+		field.String("title"),
+	}
 }
 
 // Edges of the Ticket.

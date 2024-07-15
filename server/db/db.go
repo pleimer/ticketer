@@ -29,7 +29,7 @@ func (c DBConnectionConfig) PGConnectionURL() string {
 type DB struct {
 	logger *zap.Logger
 	db     *sql.DB
-	Cli    *ent.Client
+	Client *ent.Client
 }
 
 func NewDB(logger *zap.Logger) *DB {
@@ -47,7 +47,7 @@ func (d *DB) Open(cfg DBConnectionConfig) {
 	}
 
 	driver := entsql.OpenDB(dialect.Postgres, d.db)
-	d.Cli = ent.NewClient(ent.Driver(driver))
+	d.Client = ent.NewClient(ent.Driver(driver))
 }
 
 func (d *DB) Close() {
