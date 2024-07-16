@@ -8,6 +8,9 @@ import (
 type servicesConfig struct {
 	ticketsService *services.Tickets
 	TicketsService func() *services.Tickets
+
+	longRunningOperationsService *services.LongRunningOperationsService
+	LongRunningOperationsService func() *services.LongRunningOperationsService
 }
 
 func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *repositoriesConfig) {
@@ -16,5 +19,12 @@ func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *re
 			s.ticketsService = services.NewTickets()
 		})
 		return s.ticketsService
+	}
+
+	s.LongRunningOperationsService = func() *services.LongRunningOperationsService {
+		once.Once(func() {
+			s.longRunningOperationsService = services.NewLongRunningOperationsService(loggerConfig.Logger())
+		})
+		return s.longRunningOperationsService
 	}
 }

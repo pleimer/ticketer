@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
 	"net"
 
 	"github.com/pleimer/ticketer/server/app"
@@ -22,11 +20,13 @@ func (s *Start) Execute(args []string) error {
 	app.App().DB().Open(s.DBConnectionConfig)
 	defer app.App().DB().Close()
 
-	r, err := app.App().NylasClient().ListThreadMessages(context.Background(), "AQQkADAwATNiZmYAZS04MTEAMi0zNGVjLTAwAi0wMAoAEADwPf5pU6GwRKQJc6h3MguA")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("%v\n\n", r)
+	// r, err := app.App().NylasClient().ListThreadMessages(context.Background(), "AQQkADAwATNiZmYAZS04MTEAMi0zNGVjLTAwAi0wMAoAEADwPf5pU6GwRKQJc6h3MguA")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Printf("%v\n\n", r)
+	app.App().LongRunningOperationsService().Start()
+	defer app.App().LongRunningOperationsService().Close()
 
 	app.App().Logger().Sugar().Fatal(
 		app.App().Router().Start(net.JoinHostPort("0.0.0.0", "8080")),

@@ -6,8 +6,9 @@ import (
 )
 
 type Server struct {
-	cmd.Start   `command:"start"`
-	cmd.Migrate `command:"migrate"`
+	cmd.Start     `command:"start"`
+	cmd.Migrate   `command:"migrate"`
+	cmd.RunWorker `command:"run-worker"`
 }
 
 func main() {

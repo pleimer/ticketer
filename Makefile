@@ -5,7 +5,10 @@ build:
 
 # dev
 run-local: 
-	source .env && go run ./server start --user=postgres --password=password
+	source .env && go run ./server start
+
+run-worker:
+	source .env && go run ./server run-worker
 
 hot-ui:
 	npx vite ui/ --open
@@ -25,4 +28,4 @@ gen: gen-clients gen-routes gen-db
 
 # db
 db-migrate:
-	go run ./server migrate --user=postgres --password=password
+	go run ./server migrate
