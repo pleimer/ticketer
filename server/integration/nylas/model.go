@@ -87,17 +87,18 @@ type SendMessageResult struct {
 
 // Request model structs
 type SendMessageRequest struct {
-	Subject         string           `json:"subject"`
-	Body            string           `json:"body"`
-	From            []Participant    `json:"from,omitempty"`
-	To              []Participant    `json:"to"`
-	CC              []Participant    `json:"cc,omitempty"`
-	BCC             []Participant    `json:"bcc,omitempty"`
-	ReplyTo         []Participant    `json:"reply_to,omitempty"`
-	SendAt          int64            `json:"send_at,omitempty"`
-	UseDraft        bool             `json:"use_draft,omitempty"`
-	Attachments     []Attachment     `json:"attachments,omitempty"`
-	TrackingOptions *TrackingOptions `json:"tracking_options,omitempty"`
+	Subject          string           `json:"subject"`
+	Body             string           `json:"body"`
+	From             []Participant    `json:"from,omitempty"`
+	To               []Participant    `json:"to"`
+	CC               []Participant    `json:"cc,omitempty"`
+	BCC              []Participant    `json:"bcc,omitempty"`
+	ReplyTo          []Participant    `json:"reply_to,omitempty"`
+	SendAt           int64            `json:"send_at,omitempty"`
+	UseDraft         bool             `json:"use_draft,omitempty"`
+	Attachments      []Attachment     `json:"attachments,omitempty"`
+	TrackingOptions  *TrackingOptions `json:"tracking_options,omitempty"`
+	ReplyToMessageID string           `json:"reply_to_message_id,omitempty"`
 }
 
 type TrackingOptions struct {
@@ -105,4 +106,10 @@ type TrackingOptions struct {
 	Links         bool   `json:"links"`
 	ThreadReplies bool   `json:"thread_replies"`
 	Label         string `json:"label,omitempty"`
+}
+
+// UpdateMessageResponse update message response
+type UpdateMessageResponse struct {
+	RequestID string  `json:"request_id"`
+	Data      Message `json:"data"`
 }

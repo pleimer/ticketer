@@ -41,7 +41,7 @@ func (c *NylasClient) ListThreadMessages(threadID string) (*ThreadResponse, erro
 	return &threadResp, nil
 }
 
-func (c *NylasClient) GetMessages(limit int) (*MessagesResponse, error) {
+func (c *NylasClient) GetUnreadMessages(limit int) (*MessagesResponse, error) {
 	query := url.Values{}
 	query.Set("unread", "true")
 	query.Set("limit", fmt.Sprintf("%d", limit))
@@ -71,4 +71,27 @@ func (c *NylasClient) SendMessage(msg *SendMessageRequest) (*SendMessageResponse
 	}
 
 	return &sendResp, nil
+}
+
+func (c *NylasClient) UpdateMessageReadStatus(messageID string, unread bool) (*UpdateMessageResponse, error) {
+
+	path := fmt.Sprintf("/v3/grants/%s/messages/%s", c.httpClient.grantID, messageID)
+
+	requestBody := struct {
+		Unread bool `json:"unread"`
+	}{
+		Unread: unread,
+	}
+
+	responseBody, err := c.httpClient.doRequest("PUT", path, nil, requestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	var messageResp UpdateMessageResponse
+	if err := json.Unmarshal(responseBody, &messageResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &messageResp, nil
 }

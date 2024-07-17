@@ -47,6 +47,8 @@ func NewDB(logger *zap.Logger, cfg DBConnectionConfig) *DB {
 		d.logger.Fatal("connecting to db", zap.Error(err))
 	}
 
+	// TODO: add reconnect logic when db connection is lost
+
 	driver := entsql.OpenDB(dialect.Postgres, d.db)
 	d.Client = ent.NewClient(ent.Driver(driver))
 	return d

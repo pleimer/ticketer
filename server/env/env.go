@@ -22,6 +22,9 @@ func (e *Env) Cleanup() {
 	if e.longRunningOperationsService != nil {
 		e.longRunningOperationsService.Close()
 	}
+	if e.router != nil {
+		e.router.Close()
+	}
 }
 
 var app *Env
