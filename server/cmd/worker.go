@@ -33,6 +33,9 @@ func (r *RunWorker) Execute(args []string) error {
 	w := worker.New(c, "email-ingestor-taskqueue", worker.Options{})
 	w.RegisterWorkflow(app.LongRunningOperationsService().EmailIngestorWorkflow)
 	w.RegisterActivity(app.LongRunningOperationsService().QueryNewMessagesActivity)
+	w.RegisterActivity(app.LongRunningOperationsService().UpdateMessageReadStatusActivity)
+	w.RegisterActivity(app.LongRunningOperationsService().ProcessNewMessagesActivity)
+	w.RegisterActivity(app.LongRunningOperationsService().SendTicketCreationAcknowledgementActivity)
 
 	err = w.Run(worker.InterruptCh())
 	if err != nil {

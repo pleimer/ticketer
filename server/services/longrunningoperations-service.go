@@ -94,7 +94,8 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 	}
 
 	// No need to wait on update message status. If this fails, new messages that have already
-	// been processed will be filtered our in the process messages activity
+	// been processed will be filtered our in the process messages activity in the next workflow
+	// run
 	workflow.ExecuteActivity(ctx, lro.UpdateMessageReadStatusActivity)
 
 	var processNewMessagesRes []SendTicketCreationAcknowledgementRequest
@@ -103,8 +104,26 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 		return err
 	}
 
-	// TODO: this needs to retry on failure, but only for messages messages that were not successfully replied to already
-	return workflow.ExecuteActivity(ctx, lro.SendTicketCreationAcknowledgementActivity, processNewMessagesRes).Get(ctx, nil)
+	// send response to users where inquiries resulted in new ticket being created
+
+	// retry policy for failed sends will be much longer
+	sendAckActivityOptions := workflow.ActivityOptions{
+		StartToCloseTimeout: time.Minute,
+		RetryPolicy: &temporal.RetryPolicy{
+			InitialInterval:    time.Second,
+			BackoffCoefficient: 2.0,
+			MaximumInterval:    100 * time.Second,
+			MaximumAttempts:    500,
+		},
+	}
+
+	ctx = workflow.WithActivityOptions(ctx, sendAckActivityOptions)
+
+	// thus, do not block the the current workflow
+	for _, r := range processNewMessagesRes {
+		workflow.ExecuteActivity(ctx, lro.SendTicketCreationAcknowledgementActivity, r)
+	}
+	return nil
 }
 
 func (lro *LongRunningOperationsService) QueryNewMessagesActivity(ctx context.Context) (*nylas.MessagesResponse, error) {
@@ -162,22 +181,14 @@ type SendTicketCreationAcknowledgementRequest struct {
 	MessageID string
 }
 
-func (lro *LongRunningOperationsService) SendTicketCreationAcknowledgementActivity(ctx context.Context, reqs []SendTicketCreationAcknowledgementRequest) error {
-
-	for _, r := range reqs {
-		_, err := lro.nylasClient.SendMessage(&nylas.SendMessageRequest{
-			Subject: "[Ticketer] New Ticket Created",
-			Body:    "New Ticket Created",
-			ReplyTo: []nylas.Participant{
-				r.Initiator,
-			},
-			ReplyToMessageID: r.MessageID,
-		})
-		if err != nil {
-			// TODO: handle specific error codes
-			return err
-		}
-	}
-
-	return nil
+func (lro *LongRunningOperationsService) SendTicketCreationAcknowledgementActivity(ctx context.Context, req SendTicketCreationAcknowledgementRequest) (err error) {
+	_, err = lro.nylasClient.SendMessage(&nylas.SendMessageRequest{
+		Subject: "[Ticketer] New Ticket Created",
+		Body:    "New Ticket Created",
+		To: []nylas.Participant{
+			req.Initiator,
+		},
+		ReplyToMessageID: req.MessageID,
+	})
+	return
 }

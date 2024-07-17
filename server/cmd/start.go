@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"net"
 	"os"
 	"os/signal"
@@ -33,12 +32,6 @@ func (s *Start) Execute(args []string) error {
 		<-sigs
 		app.Cleanup()
 	}()
-
-	r, err := app.NylasClient().GetUnreadMessages(5)
-	if err != nil {
-		app.Logger().Fatal(err.Error())
-	}
-	fmt.Println(r)
 
 	// Starts a temporal workflow that polls the nylas API. Typically, we would
 	app.LongRunningOperationsService()
