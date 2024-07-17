@@ -82,7 +82,7 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 
 func (lro *LongRunningOperationsService) QueryNewMessagesActivity(ctx context.Context) (string, error) {
 
-	lro.nylasClient.ListThreadMessages(ctx, "")
+	lro.nylasClient.ListThreadMessages("")
 
 	return "", nil
 }

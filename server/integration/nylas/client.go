@@ -1,11 +1,8 @@
 package nylas
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 )
 
@@ -19,121 +16,57 @@ type NylasClientConfig struct {
 }
 
 type NylasClient struct {
-	baseURL string
-	grantID string
-	apiKey  string
-	client  *http.Client
+	httpClient *nylasHTTPClient
 }
 
 func NewNylasClient(cfg NylasClientConfig) *NylasClient {
 	return &NylasClient{
-		baseURL: cfg.APIURI,
-		apiKey:  cfg.APIKey,
-		grantID: cfg.GrantID,
-		client:  &http.Client{},
+		httpClient: newNylasHTTPClient(cfg.APIURI, cfg.GrantID, cfg.APIKey),
 	}
 }
 
-func (c *NylasClient) ListThreadMessages(ctx context.Context, threadID string) (*ThreadResponse, error) {
-	url := fmt.Sprintf("%s/v3/grants/%s/threads/%s", c.baseURL, c.grantID, threadID)
+func (c *NylasClient) ListThreadMessages(threadID string) (*ThreadResponse, error) {
+	path := fmt.Sprintf("/v3/grants/%s/threads/%s", c.httpClient.grantID, threadID)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	responseBody, err := c.httpClient.doRequest("GET", path, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error creating request: %w", err)
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error making request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, err
 	}
 
 	var threadResp ThreadResponse
-	if err := json.NewDecoder(resp.Body).Decode(&threadResp); err != nil {
-		return nil, fmt.Errorf("error decoding response: %w", err)
+	if err := json.Unmarshal(responseBody, &threadResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return &threadResp, nil
 }
 
-func (c *NylasClient) GetMessages(ctx context.Context, limit int) (*MessagesResponse, error) {
-	endpoint := fmt.Sprintf("%s/v3/grants/%s/messages", c.baseURL, c.grantID)
+func (c *NylasClient) GetMessages(limit int) (*MessagesResponse, error) {
+	query := url.Values{}
+	query.Set("unread", "true")
+	query.Set("limit", fmt.Sprintf("%d", limit))
 
-	// Create URL with query parameters
-	u, err := url.Parse(endpoint)
+	responseBody, err := c.httpClient.doRequest("GET", fmt.Sprintf("/v3/grants/%s/messages", c.httpClient.grantID), query, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse URL: %w", err)
-	}
-
-	q := u.Query()
-	q.Set("unread", "true")
-	q.Set("limit", fmt.Sprintf("%d", limit))
-	u.RawQuery = q.Encode()
-
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, err
 	}
 
 	var messagesResp MessagesResponse
-	if err := json.NewDecoder(resp.Body).Decode(&messagesResp); err != nil {
+	if err := json.Unmarshal(responseBody, &messagesResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return &messagesResp, nil
 }
 
-// SendMessage sends a message using the Nylas API
 func (c *NylasClient) SendMessage(msg *SendMessageRequest) (*SendMessageResponse, error) {
-	endpoint := fmt.Sprintf("%s/v3/grants/%s/messages/send", c.baseURL, c.grantID)
-
-	payload, err := json.Marshal(msg)
+	responseBody, err := c.httpClient.doRequest("POST", fmt.Sprintf("/v3/grants/%s/messages/send", c.httpClient.grantID), nil, msg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, err
 	}
 
 	var sendResp SendMessageResponse
-	if err := json.NewDecoder(resp.Body).Decode(&sendResp); err != nil {
+	if err := json.Unmarshal(responseBody, &sendResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
