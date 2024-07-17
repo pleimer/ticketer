@@ -58,3 +58,51 @@ type Attachment struct {
 	Size        int    `json:"size"`
 	Filename    string `json:"filename,omitempty"`
 }
+
+// Response model structs
+type MessagesResponse struct {
+	RequestID  string    `json:"request_id"`
+	Data       []Message `json:"data"`
+	NextCursor string    `json:"next_cursor"`
+}
+
+// SendMessageResponse represents the response from sending a message
+type SendMessageResponse struct {
+	RequestID string            `json:"request_id"`
+	GrantID   string            `json:"grant_id"`
+	Data      SendMessageResult `json:"data"`
+}
+
+// SendMessageResult represents the details of the sent message
+type SendMessageResult struct {
+	Subject     string        `json:"subject"`
+	Body        string        `json:"body"`
+	From        []Participant `json:"from"`
+	To          []Participant `json:"to"`
+	CC          []Participant `json:"cc,omitempty"`
+	BCC         []Participant `json:"bcc,omitempty"`
+	Attachments []Attachment  `json:"attachments,omitempty"`
+	ScheduleID  string        `json:"schedule_id,omitempty"`
+}
+
+// Request model structs
+type SendMessageRequest struct {
+	Subject         string           `json:"subject"`
+	Body            string           `json:"body"`
+	From            []Participant    `json:"from,omitempty"`
+	To              []Participant    `json:"to"`
+	CC              []Participant    `json:"cc,omitempty"`
+	BCC             []Participant    `json:"bcc,omitempty"`
+	ReplyTo         []Participant    `json:"reply_to,omitempty"`
+	SendAt          int64            `json:"send_at,omitempty"`
+	UseDraft        bool             `json:"use_draft,omitempty"`
+	Attachments     []Attachment     `json:"attachments,omitempty"`
+	TrackingOptions *TrackingOptions `json:"tracking_options,omitempty"`
+}
+
+type TrackingOptions struct {
+	Opens         bool   `json:"opens"`
+	Links         bool   `json:"links"`
+	ThreadReplies bool   `json:"thread_replies"`
+	Label         string `json:"label,omitempty"`
+}

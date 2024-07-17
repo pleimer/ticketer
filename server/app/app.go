@@ -30,9 +30,9 @@ func init() {
 	loggerConfig.init()
 	dbConfig.init(&loggerConfig)
 	repositoriesConfig.init(&dbConfig)
-	servicesConfig.init(&loggerConfig, &repositoriesConfig)
 	routerConfig.init(&loggerConfig, &servicesConfig)
 	integrationsConfig.init(&loggerConfig)
+	servicesConfig.init(&loggerConfig, &repositoriesConfig, &integrationsConfig)
 
 	App = func() *Env {
 		once.Once(func() {

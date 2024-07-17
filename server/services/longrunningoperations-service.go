@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/pleimer/ticketer/server/integration/nylas"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
@@ -11,19 +12,21 @@ import (
 )
 
 type LongRunningOperationsService struct {
-	client client.Client
-	logger *zap.Logger
+	client      client.Client
+	nylasClient *nylas.NylasClient
+	logger      *zap.Logger
 }
 
-func NewLongRunningOperationsService(logger *zap.Logger) *LongRunningOperationsService {
+func NewLongRunningOperationsService(logger *zap.Logger, nylas *nylas.NylasClient) *LongRunningOperationsService {
 	temporalClient, err := client.Dial(client.Options{})
 	if err != nil {
 		logger.Fatal("dialing temporal cluster", zap.Error(err))
 	}
 
 	return &LongRunningOperationsService{
-		client: temporalClient,
-		logger: logger,
+		client:      temporalClient,
+		nylasClient: nylas,
+		logger:      logger,
 	}
 }
 
@@ -34,7 +37,7 @@ func (lro *LongRunningOperationsService) Start() {
 		CronSchedule: "*/1 * * * *", // Run every 5 minutes
 	}
 
-	we, err := lro.client.ExecuteWorkflow(context.Background(), opts, EmailIngestorWorkflow)
+	we, err := lro.client.ExecuteWorkflow(context.Background(), opts, lro.EmailIngestorWorkflow)
 	if err != nil {
 		lro.logger.Sugar().Fatalf("Unabe to execute workflow: %v", err)
 	}
@@ -47,7 +50,7 @@ func (lro *LongRunningOperationsService) Close() {
 	lro.client.Close()
 }
 
-func EmailIngestorWorkflow(ctx workflow.Context) (string, error) {
+func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Context) (string, error) {
 
 	retrypolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
@@ -69,7 +72,7 @@ func EmailIngestorWorkflow(ctx workflow.Context) (string, error) {
 
 	var res string
 
-	err := workflow.ExecuteActivity(ctx, QueryNewMessagesActivity).Get(ctx, &res)
+	err := workflow.ExecuteActivity(ctx, lro.QueryNewMessagesActivity).Get(ctx, &res)
 	if err != nil {
 		return "", err
 	}
@@ -77,8 +80,9 @@ func EmailIngestorWorkflow(ctx workflow.Context) (string, error) {
 	return res, nil
 }
 
-func QueryNewMessagesActivity(ctx context.Context) (string, error) {
+func (lro *LongRunningOperationsService) QueryNewMessagesActivity(ctx context.Context) (string, error) {
 
-	return "completed messages query activity", nil
+	lro.nylasClient.ListThreadMessages(ctx, "")
 
+	return "", nil
 }

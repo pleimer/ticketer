@@ -1,10 +1,12 @@
 package nylas
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 // Nylas API documentatino: https://developer.nylas.com/docs/v3/email/#add-labels-to-email-messages
@@ -60,4 +62,80 @@ func (c *NylasClient) ListThreadMessages(ctx context.Context, threadID string) (
 	}
 
 	return &threadResp, nil
+}
+
+func (c *NylasClient) GetMessages(ctx context.Context, limit int) (*MessagesResponse, error) {
+	endpoint := fmt.Sprintf("%s/v3/grants/%s/messages", c.baseURL, c.grantID)
+
+	// Create URL with query parameters
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse URL: %w", err)
+	}
+
+	q := u.Query()
+	q.Set("unread", "true")
+	q.Set("limit", fmt.Sprintf("%d", limit))
+	u.RawQuery = q.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var messagesResp MessagesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&messagesResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &messagesResp, nil
+}
+
+// SendMessage sends a message using the Nylas API
+func (c *NylasClient) SendMessage(msg *SendMessageRequest) (*SendMessageResponse, error) {
+	endpoint := fmt.Sprintf("%s/v3/grants/%s/messages/send", c.baseURL, c.grantID)
+
+	payload, err := json.Marshal(msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	var sendResp SendMessageResponse
+	if err := json.NewDecoder(resp.Body).Decode(&sendResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &sendResp, nil
 }
