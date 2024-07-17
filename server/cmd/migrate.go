@@ -3,8 +3,8 @@ package cmd
 import (
 	"context"
 
-	"github.com/pleimer/ticketer/server/app"
 	"github.com/pleimer/ticketer/server/db"
+	"github.com/pleimer/ticketer/server/env"
 	"go.uber.org/zap"
 )
 
@@ -16,11 +16,11 @@ type Migrate struct {
 
 func (m *Migrate) Execute(args []string) error {
 
-	app.App().DB().Open(m.DBConnectionConfig)
-	defer app.App().DB().Close()
+	env.App().DB().Open(m.DBConnectionConfig)
+	defer env.App().DB().Close()
 
-	if err := app.App().DB().Client.Schema.Create(context.Background()); err != nil {
-		app.App().Logger().Fatal("creating schema", zap.Error(err))
+	if err := env.App().DB().Client.Schema.Create(context.Background()); err != nil {
+		env.App().Logger().Fatal("creating schema", zap.Error(err))
 	}
 
 	return nil

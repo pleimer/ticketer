@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/pleimer/ticketer/server/app"
 	"github.com/pleimer/ticketer/server/db"
+	"github.com/pleimer/ticketer/server/env"
 	"github.com/pleimer/ticketer/server/integration/nylas"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
@@ -18,17 +18,17 @@ func (r *RunWorker) Execute(args []string) error {
 
 	c, err := client.Dial(client.Options{})
 	if err != nil {
-		app.App().Logger().Sugar().Fatalf("Unable to create Temporal client.", err)
+		env.App().Logger().Sugar().Fatalf("Unable to create Temporal client.", err)
 	}
 	defer c.Close()
 
 	w := worker.New(c, "email-ingestor-taskqueue", worker.Options{})
-	w.RegisterWorkflow(app.App().LongRunningOperationsService().EmailIngestorWorkflow)
-	w.RegisterActivity(app.App().LongRunningOperationsService().QueryNewMessagesActivity)
+	w.RegisterWorkflow(env.App().LongRunningOperationsService().EmailIngestorWorkflow)
+	w.RegisterActivity(env.App().LongRunningOperationsService().QueryNewMessagesActivity)
 
 	err = w.Run(worker.InterruptCh())
 	if err != nil {
-		app.App().Logger().Fatal("starting worker", zap.Error(err))
+		env.App().Logger().Fatal("starting worker", zap.Error(err))
 	}
 
 	return nil
