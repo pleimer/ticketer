@@ -27,27 +27,29 @@ func (c DBConnectionConfig) PGConnectionURL() string {
 }
 
 type DB struct {
+	cfg    DBConnectionConfig
 	logger *zap.Logger
 	db     *sql.DB
 	Client *ent.Client
 }
 
-func NewDB(logger *zap.Logger) *DB {
-	return &DB{
-		logger: logger,
-	}
-}
+func NewDB(logger *zap.Logger, cfg DBConnectionConfig) *DB {
 
-func (d *DB) Open(cfg DBConnectionConfig) {
 	var err error
 
-	d.db, err = sql.Open("pgx", cfg.PGConnectionURL())
+	d := &DB{
+		cfg:    cfg,
+		logger: logger,
+	}
+
+	d.db, err = sql.Open("pgx", d.cfg.PGConnectionURL())
 	if err != nil {
 		d.logger.Fatal("connecting to db", zap.Error(err))
 	}
 
 	driver := entsql.OpenDB(dialect.Postgres, d.db)
 	d.Client = ent.NewClient(ent.Driver(driver))
+	return d
 }
 
 func (d *DB) Close() {

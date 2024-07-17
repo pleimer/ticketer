@@ -15,21 +15,18 @@ type Start struct {
 
 func (s *Start) Execute(args []string) error {
 
-	env.App().NylasClientConfig = s.NylasClientConfig
+	app := env.NewEnv()
+	defer app.Cleanup()
 
-	env.App().DB().Open(s.DBConnectionConfig)
-	defer env.App().DB().Close()
+	// Usually, config should be applied based on the type of environment being instantiated (stg, prod, test, dev).
+	// For this project, since there is only one environment, will just apply configurations here
+	app.NylasClientConfig = s.NylasClientConfig
+	app.DBConnectionConfig = s.DBConnectionConfig
 
-	// r, err := app.App().NylasClient().ListThreadMessages(context.Background(), "AQQkADAwATNiZmYAZS04MTEAMi0zNGVjLTAwAi0wMAoAEADwPf5pU6GwRKQJc6h3MguA")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Printf("%v\n\n", r)
-	env.App().LongRunningOperationsService().Start()
-	defer env.App().LongRunningOperationsService().Close()
+	// TODO: move this to a cleanup function in the env package
 
-	env.App().Logger().Sugar().Fatal(
-		env.App().Router().Start(net.JoinHostPort("0.0.0.0", "8080")),
+	app.Logger().Sugar().Fatal(
+		app.Router().Start(net.JoinHostPort("0.0.0.0", "8080")),
 	)
 
 	return nil

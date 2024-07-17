@@ -1,11 +1,6 @@
 package env
 
-import (
-	"github.com/pleimer/ticketer/server/lib/once"
-)
-
 // Env contains all application singletons and lazy loads the dependancy tree
-var App func() *Env
 
 type Env struct {
 	*loggerConfig
@@ -16,8 +11,28 @@ type Env struct {
 	*integrationsConfig
 }
 
+// Cleanup all environment resources that must perform cleanup actions on exit
+// There is a cleaner way to do this by registering close functions lazily, but
+// this works for now
+func (e *Env) Cleanup() {
+
+	if e.db != nil {
+		e.db.Close()
+	}
+	if e.longRunningOperationsService != nil {
+		e.longRunningOperationsService.Close()
+	}
+}
+
+var app *Env
+
+// NewEnv typically used to create different env based on config (prd, dev, stg).j
+// For this project, will only create use the one type
+func NewEnv() *Env {
+	return app
+}
+
 func init() {
-	var e *Env
 
 	loggerConfig := loggerConfig{}
 	dbConfig := dbConfig{}
@@ -34,10 +49,5 @@ func init() {
 	integrationsConfig.init(&loggerConfig)
 	servicesConfig.init(&loggerConfig, &repositoriesConfig, &integrationsConfig)
 
-	App = func() *Env {
-		once.Once(func() {
-			e = &Env{&loggerConfig, &dbConfig, &repositoriesConfig, &servicesConfig, &routerConfig, &integrationsConfig}
-		})
-		return e
-	}
+	app = &Env{&loggerConfig, &dbConfig, &repositoriesConfig, &servicesConfig, &routerConfig, &integrationsConfig}
 }

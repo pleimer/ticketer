@@ -23,11 +23,15 @@ func NewLongRunningOperationsService(logger *zap.Logger, nylas *nylas.NylasClien
 		logger.Fatal("dialing temporal cluster", zap.Error(err))
 	}
 
-	return &LongRunningOperationsService{
+	lro := &LongRunningOperationsService{
 		client:      temporalClient,
 		nylasClient: nylas,
 		logger:      logger,
 	}
+
+	lro.Start()
+
+	return lro
 }
 
 func (lro *LongRunningOperationsService) Start() {

@@ -16,19 +16,27 @@ type RunWorker struct {
 
 func (r *RunWorker) Execute(args []string) error {
 
+	app := env.NewEnv()
+	defer app.Cleanup()
+
+	// Usually, config should be applied based on the type of environment being instantiated (stg, prod, test, dev).
+	// For this project, since there is only one environment, will just apply configurations here
+	app.NylasClientConfig = r.NylasClientConfig
+	app.DBConnectionConfig = r.DBConnectionConfig
+
 	c, err := client.Dial(client.Options{})
 	if err != nil {
-		env.App().Logger().Sugar().Fatalf("Unable to create Temporal client.", err)
+		app.Logger().Sugar().Fatalf("Unable to create Temporal client.", err)
 	}
 	defer c.Close()
 
 	w := worker.New(c, "email-ingestor-taskqueue", worker.Options{})
-	w.RegisterWorkflow(env.App().LongRunningOperationsService().EmailIngestorWorkflow)
-	w.RegisterActivity(env.App().LongRunningOperationsService().QueryNewMessagesActivity)
+	w.RegisterWorkflow(app.LongRunningOperationsService().EmailIngestorWorkflow)
+	w.RegisterActivity(app.LongRunningOperationsService().QueryNewMessagesActivity)
 
 	err = w.Run(worker.InterruptCh())
 	if err != nil {
-		env.App().Logger().Fatal("starting worker", zap.Error(err))
+		app.Logger().Fatal("starting worker", zap.Error(err))
 	}
 
 	return nil

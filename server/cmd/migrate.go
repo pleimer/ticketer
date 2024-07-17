@@ -16,11 +16,13 @@ type Migrate struct {
 
 func (m *Migrate) Execute(args []string) error {
 
-	env.App().DB().Open(m.DBConnectionConfig)
-	defer env.App().DB().Close()
+	app := env.NewEnv()
+	defer app.Cleanup()
 
-	if err := env.App().DB().Client.Schema.Create(context.Background()); err != nil {
-		env.App().Logger().Fatal("creating schema", zap.Error(err))
+	app.DBConnectionConfig = m.DBConnectionConfig
+
+	if err := app.DB().Client.Schema.Create(context.Background()); err != nil {
+		app.Logger().Fatal("creating schema", zap.Error(err))
 	}
 
 	return nil

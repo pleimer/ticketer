@@ -6,6 +6,8 @@ import (
 )
 
 type dbConfig struct {
+	DBConnectionConfig db.DBConnectionConfig
+
 	db *db.DB
 	DB func() *db.DB
 }
@@ -15,6 +17,7 @@ func (d *dbConfig) init(loggerConfig *loggerConfig) {
 		once.Once(func() {
 			d.db = db.NewDB(
 				loggerConfig.Logger(),
+				d.DBConnectionConfig,
 			)
 		})
 		return d.db
