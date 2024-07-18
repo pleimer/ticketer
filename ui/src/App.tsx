@@ -37,6 +37,7 @@ export default function App() {
     <Container maxWidth="sm">
       {notStartedTickets?.data?.map((ticket) => {
         return <Box sx={{ my: 4 }}>
+            <p>{ticket.id}</p>
             <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
               {ticket.title}
             </Typography>
