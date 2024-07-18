@@ -16,22 +16,26 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"github.com/oapi-codegen/runtime"
+	. "github.com/pleimer/ticketer/server/models"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Create a new ticket
+	// List Tickets
+	// (GET /tickets)
+	ListTicket(ctx echo.Context, params ListTicketParams) error
+	// Create a new Ticket
 	// (POST /tickets)
-	PostTickets(ctx echo.Context) error
-	// Get ticket
-	// (GET /tickets/{ticketId})
-	GetTicket(ctx echo.Context, ticketId string) error
-	// Add a comment to a ticket
-	// (POST /tickets/{ticketId}/comments)
-	PostTicketsTicketIdComments(ctx echo.Context, ticketId int) error
-	// Update the status of a ticket
-	// (PUT /tickets/{ticketId}/status)
-	PutTicketsTicketIdStatus(ctx echo.Context, ticketId int) error
+	CreateTicket(ctx echo.Context) error
+	// Deletes a Ticket by ID
+	// (DELETE /tickets/{id})
+	DeleteTicket(ctx echo.Context, id int) error
+	// Find a Ticket by ID
+	// (GET /tickets/{id})
+	ReadTicket(ctx echo.Context, id int) error
+	// Updates a Ticket
+	// (PATCH /tickets/{id})
+	UpdateTicket(ctx echo.Context, id int) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -39,60 +43,85 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// PostTickets converts echo context to params.
-func (w *ServerInterfaceWrapper) PostTickets(ctx echo.Context) error {
+// ListTicket converts echo context to params.
+func (w *ServerInterfaceWrapper) ListTicket(ctx echo.Context) error {
 	var err error
 
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostTickets(ctx)
-	return err
-}
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListTicketParams
+	// ------------- Optional query parameter "page" -------------
 
-// GetTicket converts echo context to params.
-func (w *ServerInterfaceWrapper) GetTicket(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "ticketId" -------------
-	var ticketId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "ticketId", ctx.Param("ticketId"), &ticketId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter ticketId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// ------------- Optional query parameter "itemsPerPage" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "itemsPerPage", ctx.QueryParams(), &params.ItemsPerPage)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter itemsPerPage: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetTicket(ctx, ticketId)
+	err = w.Handler.ListTicket(ctx, params)
 	return err
 }
 
-// PostTicketsTicketIdComments converts echo context to params.
-func (w *ServerInterfaceWrapper) PostTicketsTicketIdComments(ctx echo.Context) error {
+// CreateTicket converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateTicket(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "ticketId" -------------
-	var ticketId int
-
-	err = runtime.BindStyledParameterWithOptions("simple", "ticketId", ctx.Param("ticketId"), &ticketId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter ticketId: %s", err))
-	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostTicketsTicketIdComments(ctx, ticketId)
+	err = w.Handler.CreateTicket(ctx)
 	return err
 }
 
-// PutTicketsTicketIdStatus converts echo context to params.
-func (w *ServerInterfaceWrapper) PutTicketsTicketIdStatus(ctx echo.Context) error {
+// DeleteTicket converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteTicket(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "ticketId" -------------
-	var ticketId int
+	// ------------- Path parameter "id" -------------
+	var id int
 
-	err = runtime.BindStyledParameterWithOptions("simple", "ticketId", ctx.Param("ticketId"), &ticketId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter ticketId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PutTicketsTicketIdStatus(ctx, ticketId)
+	err = w.Handler.DeleteTicket(ctx, id)
+	return err
+}
+
+// ReadTicket converts echo context to params.
+func (w *ServerInterfaceWrapper) ReadTicket(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ReadTicket(ctx, id)
+	return err
+}
+
+// UpdateTicket converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateTicket(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.UpdateTicket(ctx, id)
 	return err
 }
 
@@ -124,29 +153,33 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.POST(baseURL+"/tickets", wrapper.PostTickets)
-	router.GET(baseURL+"/tickets/:ticketId", wrapper.GetTicket)
-	router.POST(baseURL+"/tickets/:ticketId/comments", wrapper.PostTicketsTicketIdComments)
-	router.PUT(baseURL+"/tickets/:ticketId/status", wrapper.PutTicketsTicketIdStatus)
+	router.GET(baseURL+"/tickets", wrapper.ListTicket)
+	router.POST(baseURL+"/tickets", wrapper.CreateTicket)
+	router.DELETE(baseURL+"/tickets/:id", wrapper.DeleteTicket)
+	router.GET(baseURL+"/tickets/:id", wrapper.ReadTicket)
+	router.PATCH(baseURL+"/tickets/:id", wrapper.UpdateTicket)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/9RWTU/kOBD9K1btHrN0s8tecgNWQn1YCQk4IYQ8caXbTPyBXQa1UP77yI7TH0l6gBkG",
-	"aW6WP8qv3ntV9gtURlmjUZOH8gV8tULF0/DcKIWa4tA6Y9GRxLRQGU15gdYWoQRPTuoltAVUDjmhuOdp",
-	"uTZOxREITvgXSYVQjM9IsRNKasIlujhPsvqKdD+93G4CmS8PWFE8kBGfJwzvwd0W4PAxSIcCytvNxruJ",
-	"O64TqIngP5C4QF85aUkaPUnmIWKsk8ZJWsdV1EFFzI15hgIUChkUFLCSy9UO/m1MT5yC3z1pLGooQOp7",
-	"68zSofcQ6fCmeUIBBVSN8Sgmg5GkBiehByveSUd7kOxDer5G3y5NAmsemghhQ9F7mTuU7MA83bZ9cQ8b",
-	"6SrJcZPYGmf4gWINUObIY2Bxo9S1GREMp5cLVhvHFNd8KfWS+WCtccS6Oo1AMkU5N/Z/3ImxJNnp5QIK",
-	"eELnu2DHR/OjeaQhJsSthBL+SVMFWE6rlPOsDxx5MT45KbLDI6CFgBIujafrze0xP/R0ZsR6UO7c2kZW",
-	"6dzswXd26TpdHP3psIYS/phtW+Es98HZngPbfRbJBUwT3hrtO8X+nh9/8N3drftSZH5zz2E+VBV6X4em",
-	"WUdOT+bzsXxnXLDMUHKDD0pxt4YSuuwYZxqfs5hpR8//7KUbLEQbwy679rcf/QKJRRsGV6Fn3HtTyYTt",
-	"WdKKceYtVrKWVY7PFv9BMRDzArOWyQOOKyR0Hsrb4V03Wj4GZFKgJllLdMzUjFbYY48GhjL5CArQXEVL",
-	"9inAUMFiR41hzdyN1J1/grpXGzlZf3un6smY9+wEbYjVJmgRN/47Jf9CEzrNG+bRPaFj6JxxAyNEEb+v",
-	"f0xE9X+FV2vyOh877w+NhP1Joba/gbtfU/77P4pPrv/+AzZhkbzEuBCT9f8mp+xpfyoE4yzLy8gw/poV",
-	"to+TDVM+CEMbdG/d72eCiZf6TU6Yf95L0GnB8q/rQwzRZZr6ao5u6l1TtO23AAAA//866HQnPAwAAA==",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

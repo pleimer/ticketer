@@ -1,8 +1,8 @@
 package: services
 output: tickets-service.gen.go
-# additional-imports:
-#   - package: github.com/pleimer/ticketer/server/models
-#     alias: .
+additional-imports:
+  - package: github.com/pleimer/ticketer/server/models
+    alias: .
 generate:
   echo-server: true
   embedded-spec: true

@@ -18,11 +18,11 @@ hot-ui:
 gen-clients:
 	npx orval --config ./internal/api/orval.config.js
 
-gen-routes:
+gen-server:
 	go generate ./server/...
 
-gen-db:
-	go generate ./server/ent 
+# gen-db:
+# 	go generate ./server/ent 
 
 gen: gen-clients gen-routes gen-db
 

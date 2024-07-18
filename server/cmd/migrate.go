@@ -11,13 +11,17 @@ import (
 // Migrate command for versioned migrations in production. For this
 // excercise, just use auto-migration
 type Migrate struct {
+	skipCleanup bool
+
 	db.DBConnectionConfig
 }
 
 func (m *Migrate) Execute(args []string) error {
 
 	app := env.NewEnv()
-	defer app.Cleanup()
+	if !m.skipCleanup {
+		defer app.Cleanup()
+	}
 
 	app.DBConnectionConfig = m.DBConnectionConfig
 

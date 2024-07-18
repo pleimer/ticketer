@@ -33,6 +33,7 @@ ui/src/clients
 server/ent/*
 
 !server/ent/generate.go
+!server/ent/entc.go
 !server/ent/schema
 
 # infra

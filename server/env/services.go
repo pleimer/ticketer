@@ -16,7 +16,7 @@ type servicesConfig struct {
 func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *repositoriesConfig, integrationsConfig *integrationsConfig, dbConfig *dbConfig) {
 	s.TicketsService = func() *services.Tickets {
 		once.Once(func() {
-			s.ticketsService = services.NewTickets()
+			s.ticketsService = services.NewTickets(dbConfig.DB(), loggerConfig.Logger())
 		})
 		return s.ticketsService
 	}

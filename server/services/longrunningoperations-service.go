@@ -229,10 +229,8 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 		}
 		builders = append(builders,
 			lro.db.Client.Ticket.Create().
-				SetPriority(0).
 				SetThreadID(m.ThreadID).
-				SetTitle(m.Subject).
-				SetStatus(0),
+				SetTitle(m.Subject),
 		)
 
 		res = append(res, SendTicketCreationAcknowledgementRequest{

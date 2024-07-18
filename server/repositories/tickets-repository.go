@@ -22,13 +22,14 @@ func NewTicketsRepository(db *db.DB) *TicketsRepository {
 }
 
 func (r *TicketsRepository) CreateNewTicket(ctx context.Context) (ticket *ent.Ticket, err error) {
-	return r.db.Client.Ticket.
-		Create().
-		SetPriority(0).
-		SetThreadID("").
-		SetTitle("").
-		SetStatus(0).
-		Save(ctx)
+	// return r.db.Client.Ticket.
+	// 	Create().
+	// 	SetPriority(0).
+	// 	SetThreadID("").
+	// 	SetTitle("").
+	// 	SetStatus(0).
+	// 	Save(ctx)
+	return nil, nil
 }
 
 func (r *TicketsRepository) GetTicketByID(ctx context.Context, ID int) (*ent.Ticket, error) {

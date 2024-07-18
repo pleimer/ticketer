@@ -17,8 +17,12 @@ func (Ticket) Fields() []ent.Field {
 		field.String("title"),
 		field.String("assignee").
 			Optional().Nillable(),
-		field.Int("status"),
-		field.Int("priority"),
+		field.Enum("status").
+			Values("not_started", "in_progress", "done").
+			Default("not_started"),
+		field.Enum("priority").
+			Values("low", "medium", "high").
+			Default("low"),
 		field.String("threadID"),
 	}
 }

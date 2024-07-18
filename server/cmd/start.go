@@ -9,6 +9,7 @@ import (
 	"github.com/pleimer/ticketer/server/db"
 	"github.com/pleimer/ticketer/server/env"
 	"github.com/pleimer/ticketer/server/integration/nylas"
+	"go.uber.org/zap"
 )
 
 type Start struct {
@@ -32,6 +33,17 @@ func (s *Start) Execute(args []string) error {
 		<-sigs
 		app.Cleanup()
 	}()
+
+	// run the db-migration for developer convenience. In production env, migrations would be
+	// versioned and run as a pre-deployment step
+	m := Migrate{
+		true,
+		s.DBConnectionConfig,
+	}
+	err := m.Execute(nil)
+	if err != nil {
+		app.Logger().Fatal("running auto schema migration", zap.Error(err))
+	}
 
 	// Starts a temporal workflow that polls the nylas API. Typically, we would
 	app.LongRunningOperationsService()
