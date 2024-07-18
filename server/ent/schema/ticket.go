@@ -17,6 +17,7 @@ func (Ticket) Fields() []ent.Field {
 		field.String("title"),
 		field.String("assignee").
 			Optional().Nillable(),
+		field.String("opened_by"),
 		field.Enum("status").
 			Values("not_started", "in_progress", "done").
 			Default("not_started"),

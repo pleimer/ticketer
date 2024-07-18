@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/pleimer/ticketer/server/db"
+	"github.com/pleimer/ticketer/server/ent"
 	"github.com/pleimer/ticketer/server/ent/ticket"
 	"github.com/pleimer/ticketer/server/models"
 	"go.uber.org/zap"
@@ -98,5 +99,63 @@ func (t *Tickets) ReadTicket(ctx echo.Context, id int) error {
 // Updates a Ticket
 // (PATCH /tickets/{id})
 func (t *Tickets) UpdateTicket(ctx echo.Context, id int) error {
-	panic("not implemented") // TODO: Implement
+
+	var updateData models.UpdateTicketJSONBody
+
+	if err := ctx.Bind(&updateData); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
+	}
+
+	// Start a transaction
+	tx, err := t.db.Client.Tx(ctx.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start transaction")
+	}
+	defer tx.Rollback()
+
+	// Get the ticket
+	ticketToUpdate, err := tx.Ticket.Query().Where(ticket.ID(id)).Only(ctx.Request().Context())
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return echo.NewHTTPError(http.StatusNotFound, "Ticket not found")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch ticket")
+	}
+
+	// Update the ticket
+	update := ticketToUpdate.Update()
+
+	if updateData.Title != nil {
+		update = update.SetTitle(*updateData.Title)
+	}
+	if updateData.Assignee != nil {
+		update = update.SetAssignee(*updateData.Assignee)
+	}
+	if updateData.Status != nil {
+		update = update.SetStatus(ticket.Status(*updateData.Status))
+	}
+	if updateData.Priority != nil {
+		update = update.SetPriority(ticket.Priority(*updateData.Priority))
+	}
+	if updateData.ThreadID != nil {
+		update = update.SetThreadID(*updateData.ThreadID)
+	}
+	if updateData.OpenedBy != nil {
+		update = update.SetOpenedBy(*updateData.OpenedBy)
+	}
+
+	// Save the changes
+	updatedTicket, err := update.Save(ctx.Request().Context())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update ticket")
+	}
+
+	// Commit the transaction
+	if err := tx.Commit(); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to commit transaction")
+	}
+
+	// Return the updated ticket
+	return ctx.JSON(http.StatusOK, updatedTicket)
+
 }

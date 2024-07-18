@@ -83,6 +83,9 @@
                   "assignee": {
                     "type": "string"
                   },
+                  "opened_by": {
+                    "type": "string"
+                  },
                   "status": {
                     "type": "string",
                     "enum": [
@@ -107,6 +110,7 @@
                 },
                 "required": [
                   "title",
+                  "opened_by",
                   "status",
                   "priority",
                   "threadID"
@@ -250,6 +254,9 @@
                   "assignee": {
                     "type": "string"
                   },
+                  "opened_by": {
+                    "type": "string"
+                  },
                   "status": {
                     "type": "string",
                     "enum": [
@@ -318,6 +325,9 @@
           "assignee": {
             "type": "string"
           },
+          "opened_by": {
+            "type": "string"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -343,6 +353,7 @@
         "required": [
           "id",
           "title",
+          "opened_by",
           "status",
           "priority",
           "threadID"

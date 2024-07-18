@@ -204,8 +204,14 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 		threadIds = append(threadIds, d.ThreadID)
 	}
 
+	tx, err := lro.db.Client.Tx(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed opening transaction to application db")
+	}
+	defer tx.Rollback()
+
 	// entgo upsert does not support 'RETURNING', must query and filter
-	tickets, err := lro.db.Client.Ticket.
+	tickets, err := tx.Ticket.
 		Query().
 		Where(
 			ticket.ThreadIDIn(threadIds...),
@@ -230,7 +236,8 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 		builders = append(builders,
 			lro.db.Client.Ticket.Create().
 				SetThreadID(m.ThreadID).
-				SetTitle(m.Subject),
+				SetTitle(m.Subject).
+				SetOpenedBy(m.From[0].Email),
 		)
 
 		res = append(res, SendTicketCreationAcknowledgementRequest{
@@ -240,9 +247,14 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 		})
 	}
 
-	err = lro.db.Client.Ticket.CreateBulk(builders...).Exec(ctx)
+	err = tx.Ticket.CreateBulk(builders...).Exec(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	// commit
+	if err := tx.Commit(); err != nil {
+		return nil, errors.Wrap(err, "committing transaction")
 	}
 
 	return res, nil

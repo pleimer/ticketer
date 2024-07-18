@@ -49,6 +49,7 @@ const (
 type Ticket struct {
 	Assignee *string        `json:"assignee,omitempty"`
 	Id       int            `json:"id"`
+	OpenedBy string         `json:"opened_by"`
 	Priority TicketPriority `json:"priority"`
 	Status   TicketStatus   `json:"status"`
 	ThreadID string         `json:"threadID"`
@@ -101,6 +102,7 @@ type ListTicketParams struct {
 // CreateTicketJSONBody defines parameters for CreateTicket.
 type CreateTicketJSONBody struct {
 	Assignee *string                      `json:"assignee,omitempty"`
+	OpenedBy string                       `json:"opened_by"`
 	Priority CreateTicketJSONBodyPriority `json:"priority"`
 	Status   CreateTicketJSONBodyStatus   `json:"status"`
 	ThreadID string                       `json:"threadID"`
@@ -116,6 +118,7 @@ type CreateTicketJSONBodyStatus string
 // UpdateTicketJSONBody defines parameters for UpdateTicket.
 type UpdateTicketJSONBody struct {
 	Assignee *string                       `json:"assignee,omitempty"`
+	OpenedBy *string                       `json:"opened_by,omitempty"`
 	Priority *UpdateTicketJSONBodyPriority `json:"priority,omitempty"`
 	Status   *UpdateTicketJSONBodyStatus   `json:"status,omitempty"`
 	ThreadID *string                       `json:"threadID,omitempty"`
