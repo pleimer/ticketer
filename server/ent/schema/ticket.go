@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -24,8 +26,10 @@ func (Ticket) Fields() []ent.Field {
 			Values("low", "medium", "high").
 			Default("low"),
 		field.String("thread_id"),
-		field.Time("created_at"),
-		field.Time("updated_at"),
+		field.Time("created_at").
+			Default(time.Now),
+		field.Time("updated_at").
+			Default(time.Now),
 		field.String("created_by"),
 		field.String("updated_by"),
 	}
