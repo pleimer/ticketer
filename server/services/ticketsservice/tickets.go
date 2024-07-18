@@ -147,7 +147,7 @@ func (t *Tickets) UpdateTicket(ctx echo.Context, id int) error {
 		update = update.SetThreadID(*updateData.ThreadID)
 	}
 	if updateData.OpenedBy != nil {
-		update = update.SetOpenedBy(*updateData.OpenedBy)
+		update = update.SetCreatedBy(*updateData.OpenedBy)
 	}
 
 	// Save the changes

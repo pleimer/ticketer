@@ -238,7 +238,8 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 			lro.db.Client.Ticket.Create().
 				SetThreadID(m.ThreadID).
 				SetTitle(m.Subject).
-				SetOpenedBy(m.From[0].Email),
+				SetUpdatedBy(m.From[0].Email).
+				SetCreatedBy(m.From[0].Email),
 		)
 
 		res = append(res, SendTicketCreationAcknowledgementRequest{
