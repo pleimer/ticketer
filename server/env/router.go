@@ -6,7 +6,7 @@ import (
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	middleware "github.com/oapi-codegen/echo-middleware"
 	"github.com/pleimer/ticketer/server/lib/once"
-	"github.com/pleimer/ticketer/server/services/threadsservice"
+	"github.com/pleimer/ticketer/server/services/messagesservice"
 	"github.com/pleimer/ticketer/server/services/ticketsservice"
 	"go.uber.org/zap"
 )
@@ -25,7 +25,7 @@ func (r *routerConfig) init(loggerConfig *loggerConfig, servicesConfig *services
 				panic(err)
 			}
 
-			messagesSwagger, err := threadsservice.GetSwagger()
+			messagesSwagger, err := messagesservice.GetSwagger()
 			if err != nil {
 				panic(err)
 			}
@@ -48,6 +48,13 @@ func (r *routerConfig) init(loggerConfig *loggerConfig, servicesConfig *services
 				},
 			}))
 
+			r.router.Use(echomiddleware.CORSWithConfig(echomiddleware.CORSConfig{
+				AllowOrigins:     []string{"http://localhost:8080", "http://localhost:5173"},
+				AllowMethods:     []string{echo.GET, echo.PUT, echo.POST, echo.DELETE, echo.PATCH},
+				AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+				AllowCredentials: true,
+			}))
+
 			api := r.router.Group("/api/v1/")
 
 			// Oapi swagger validator does not take group prefixes into account,
@@ -59,7 +66,7 @@ func (r *routerConfig) init(loggerConfig *loggerConfig, servicesConfig *services
 			messages := api.Group("messages", middleware.OapiRequestValidator(messagesSwagger))
 
 			ticketsservice.RegisterHandlers(tickets, servicesConfig.TicketsService())
-			threadsservice.RegisterHandlers(messages, servicesConfig.ThreadsService())
+			messagesservice.RegisterHandlers(messages, servicesConfig.ThreadsService())
 		})
 		return r.router
 	}

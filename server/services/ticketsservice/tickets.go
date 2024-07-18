@@ -46,9 +46,8 @@ func (t *Tickets) ListTicket(ctx echo.Context, params ListTicketParams) error {
 	query := t.db.Client.Ticket.Query()
 
 	// Add status filter if provided
-	status := ctx.QueryParam("status")
-	if status != "" {
-		query = query.Where(ticket.StatusEQ(ticket.Status(status)))
+	if params.Status != nil {
+		query = query.Where(ticket.StatusEQ(ticket.Status(*params.Status)))
 	}
 
 	// Execute the query with pagination

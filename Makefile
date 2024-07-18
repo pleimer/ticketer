@@ -16,7 +16,7 @@ hot-ui:
 # codegen
 
 gen-clients:
-	npx orval --config ./internal/api/orval.config.js
+	npx orval --config ./ui/orval.config.ts
 
 gen-server:
 	go generate ./server/...

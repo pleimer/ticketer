@@ -1,0 +1,4 @@
+package: messagesservice
+generate:
+  models: true
+output: messages-models.gen.go

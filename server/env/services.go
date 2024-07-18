@@ -2,13 +2,13 @@ package env
 
 import (
 	"github.com/pleimer/ticketer/server/lib/once"
-	"github.com/pleimer/ticketer/server/services/threadsservice"
+	"github.com/pleimer/ticketer/server/services/messagesservice"
 	"github.com/pleimer/ticketer/server/services/ticketsservice"
 )
 
 type servicesConfig struct {
-	threadsService *threadsservice.ThreadsService
-	ThreadsService func() *threadsservice.ThreadsService
+	threadsService *messagesservice.MessagesService
+	ThreadsService func() *messagesservice.MessagesService
 
 	ticketsService *ticketsservice.Tickets
 	TicketsService func() *ticketsservice.Tickets
@@ -25,9 +25,9 @@ func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *re
 		return s.ticketsService
 	}
 
-	s.ThreadsService = func() *threadsservice.ThreadsService {
+	s.ThreadsService = func() *messagesservice.MessagesService {
 		once.Once(func() {
-			s.threadsService = threadsservice.NewThreadsService(loggerConfig.Logger(), integrationsConfig.NylasClient())
+			s.threadsService = messagesservice.NewMessagesService(loggerConfig.Logger(), integrationsConfig.NylasClient())
 		})
 		return s.threadsService
 	}

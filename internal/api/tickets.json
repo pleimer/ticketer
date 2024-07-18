@@ -16,6 +16,20 @@
         "operationId": "listTicket",
         "parameters": [
           {
+            "name": "status",
+            "in": "query",
+            "description": "ticket status filter",
+            "schema": {
+              "type": "string",
+              "minimum": 0,
+              "enum": [
+                "not_started",
+                "in_progress",
+                "done"
+              ]
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "description": "what page to render",
@@ -50,16 +64,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/400"
+            "$ref": "#/components/responses/resp400"
           },
           "404": {
-            "$ref": "#/components/responses/404"
+            "$ref": "#/components/responses/resp404"
           },
           "409": {
-            "$ref": "#/components/responses/409"
+            "$ref": "#/components/responses/resp409"
           },
           "500": {
-            "$ref": "#/components/responses/500"
+            "$ref": "#/components/responses/resp500"
           }
         }
       },
@@ -132,13 +146,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/400"
+            "$ref": "#/components/responses/resp400"
           },
           "409": {
-            "$ref": "#/components/responses/409"
+            "$ref": "#/components/responses/resp409"
           },
           "500": {
-            "$ref": "#/components/responses/500"
+            "$ref": "#/components/responses/resp500"
           }
         }
       }
@@ -174,16 +188,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/400"
+            "$ref": "#/components/responses/resp400"
           },
           "404": {
-            "$ref": "#/components/responses/404"
+            "$ref": "#/components/responses/resp404"
           },
           "409": {
-            "$ref": "#/components/responses/409"
+            "$ref": "#/components/responses/resp409"
           },
           "500": {
-            "$ref": "#/components/responses/500"
+            "$ref": "#/components/responses/resp500"
           }
         }
       },
@@ -210,16 +224,16 @@
             "description": "Ticket with requested ID was deleted"
           },
           "400": {
-            "$ref": "#/components/responses/400"
+            "$ref": "#/components/responses/resp400"
           },
           "404": {
-            "$ref": "#/components/responses/404"
+            "$ref": "#/components/responses/resp404"
           },
           "409": {
-            "$ref": "#/components/responses/409"
+            "$ref": "#/components/responses/resp409"
           },
           "500": {
-            "$ref": "#/components/responses/500"
+            "$ref": "#/components/responses/resp500"
           }
         }
       },
@@ -296,16 +310,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/400"
+            "$ref": "#/components/responses/resp400"
           },
           "404": {
-            "$ref": "#/components/responses/404"
+            "$ref": "#/components/responses/resp404"
           },
           "409": {
-            "$ref": "#/components/responses/409"
+            "$ref": "#/components/responses/resp409"
           },
           "500": {
-            "$ref": "#/components/responses/500"
+            "$ref": "#/components/responses/resp500"
           }
         }
       }
@@ -361,7 +375,7 @@
       }
     },
     "responses": {
-      "400": {
+      "resp400": {
         "description": "invalid input, data invalid",
         "content": {
           "application/json": {
@@ -384,7 +398,7 @@
           }
         }
       },
-      "403": {
+      "resp403": {
         "description": "insufficient permissions",
         "content": {
           "application/json": {
@@ -407,7 +421,7 @@
           }
         }
       },
-      "404": {
+      "resp404": {
         "description": "resource not found",
         "content": {
           "application/json": {
@@ -430,7 +444,7 @@
           }
         }
       },
-      "409": {
+      "resp409": {
         "description": "conflicting resources",
         "content": {
           "application/json": {
@@ -453,7 +467,7 @@
           }
         }
       },
-      "500": {
+      "resp500": {
         "description": "unexpected error",
         "content": {
           "application/json": {

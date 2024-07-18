@@ -3,6 +3,8 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import ProTip from "./ProTip";
+import { useListTicket } from "./clients/tickets/tickets";
+import { ListTicketStatus } from "./clients/tickets/models/listTicketStatus";
 
 function Copyright() {
   return (
@@ -17,15 +19,29 @@ function Copyright() {
   }
 
 export default function App() {
+
+  // TODO: api should be adjusted to allow batch querying
+  const {data: notStartedTickets} = useListTicket({
+    status: ListTicketStatus.not_started
+  })
+
+  const {data: inProgressTickets} = useListTicket({
+    status: ListTicketStatus.in_progress,
+  },{
+  })
+
+  console.log(notStartedTickets?.data)
+  // console.log(inProgressTickets)
+  
   return (
     <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          Material UI Vite.js example in TypeScript
-        </Typography>
-        <ProTip />
-        <Copyright />
-      </Box>
+      {notStartedTickets?.data?.map((ticket) => {
+        return <Box sx={{ my: 4 }}>
+            <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+              {ticket.title}
+            </Typography>
+          </Box>
+      })}
     </Container>
   );
 }

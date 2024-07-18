@@ -17,6 +17,13 @@ const (
 	TicketStatusNotStarted TicketStatus = "not_started"
 )
 
+// Defines values for ListTicketParamsStatus.
+const (
+	ListTicketParamsStatusDone       ListTicketParamsStatus = "done"
+	ListTicketParamsStatusInProgress ListTicketParamsStatus = "in_progress"
+	ListTicketParamsStatusNotStarted ListTicketParamsStatus = "not_started"
+)
+
 // Defines values for CreateTicketJSONBodyPriority.
 const (
 	CreateTicketJSONBodyPriorityHigh   CreateTicketJSONBodyPriority = "high"
@@ -40,9 +47,9 @@ const (
 
 // Defines values for UpdateTicketJSONBodyStatus.
 const (
-	Done       UpdateTicketJSONBodyStatus = "done"
-	InProgress UpdateTicketJSONBodyStatus = "in_progress"
-	NotStarted UpdateTicketJSONBodyStatus = "not_started"
+	UpdateTicketJSONBodyStatusDone       UpdateTicketJSONBodyStatus = "done"
+	UpdateTicketJSONBodyStatusInProgress UpdateTicketJSONBodyStatus = "in_progress"
+	UpdateTicketJSONBodyStatusNotStarted UpdateTicketJSONBodyStatus = "not_started"
 )
 
 // Ticket defines model for Ticket.
@@ -62,29 +69,29 @@ type TicketPriority string
 // TicketStatus defines model for Ticket.Status.
 type TicketStatus string
 
-// N400 defines model for 400.
-type N400 struct {
+// Resp400 defines model for resp400.
+type Resp400 struct {
 	Code   int          `json:"code"`
 	Errors *interface{} `json:"errors,omitempty"`
 	Status string       `json:"status"`
 }
 
-// N404 defines model for 404.
-type N404 struct {
+// Resp404 defines model for resp404.
+type Resp404 struct {
 	Code   int          `json:"code"`
 	Errors *interface{} `json:"errors,omitempty"`
 	Status string       `json:"status"`
 }
 
-// N409 defines model for 409.
-type N409 struct {
+// Resp409 defines model for resp409.
+type Resp409 struct {
 	Code   int          `json:"code"`
 	Errors *interface{} `json:"errors,omitempty"`
 	Status string       `json:"status"`
 }
 
-// N500 defines model for 500.
-type N500 struct {
+// Resp500 defines model for resp500.
+type Resp500 struct {
 	Code   int          `json:"code"`
 	Errors *interface{} `json:"errors,omitempty"`
 	Status string       `json:"status"`
@@ -92,12 +99,18 @@ type N500 struct {
 
 // ListTicketParams defines parameters for ListTicket.
 type ListTicketParams struct {
+	// Status ticket status filter
+	Status *ListTicketParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+
 	// Page what page to render
 	Page *int `form:"page,omitempty" json:"page,omitempty"`
 
 	// ItemsPerPage item count to render per page
 	ItemsPerPage *int `form:"itemsPerPage,omitempty" json:"itemsPerPage,omitempty"`
 }
+
+// ListTicketParamsStatus defines parameters for ListTicket.
+type ListTicketParamsStatus string
 
 // CreateTicketJSONBody defines parameters for CreateTicket.
 type CreateTicketJSONBody struct {

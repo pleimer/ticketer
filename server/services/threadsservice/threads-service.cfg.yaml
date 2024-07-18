@@ -1,5 +1,0 @@
-package: threadsservice
-output: threads-service.gen.go
-generate:
-  echo-server: true
-  embedded-spec: true

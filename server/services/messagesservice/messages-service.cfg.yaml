@@ -1,0 +1,5 @@
+package: messagesservice 
+output: messages-service.gen.go
+generate:
+  echo-server: true
+  embedded-spec: true
