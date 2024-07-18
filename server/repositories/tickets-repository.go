@@ -9,6 +9,8 @@ import (
 	"github.com/pleimer/ticketer/server/ent/ticket"
 )
 
+// TODO: delete this
+
 type TicketsRepository struct {
 	db *db.DB
 }
@@ -17,6 +19,16 @@ func NewTicketsRepository(db *db.DB) *TicketsRepository {
 	return &TicketsRepository{
 		db,
 	}
+}
+
+func (r *TicketsRepository) CreateNewTicket(ctx context.Context) (ticket *ent.Ticket, err error) {
+	return r.db.Client.Ticket.
+		Create().
+		SetPriority(0).
+		SetThreadID("").
+		SetTitle("").
+		SetStatus(0).
+		Save(ctx)
 }
 
 func (r *TicketsRepository) GetTicketByID(ctx context.Context, ID int) (*ent.Ticket, error) {

@@ -50,7 +50,7 @@ func init() {
 	repositoriesConfig.init(&dbConfig)
 	routerConfig.init(&loggerConfig, &servicesConfig)
 	integrationsConfig.init(&loggerConfig)
-	servicesConfig.init(&loggerConfig, &repositoriesConfig, &integrationsConfig)
+	servicesConfig.init(&loggerConfig, &repositoriesConfig, &integrationsConfig, &dbConfig)
 
 	app = &Env{&loggerConfig, &dbConfig, &repositoriesConfig, &servicesConfig, &routerConfig, &integrationsConfig}
 }

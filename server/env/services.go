@@ -13,7 +13,7 @@ type servicesConfig struct {
 	LongRunningOperationsService func() *services.LongRunningOperationsService
 }
 
-func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *repositoriesConfig, integrationsConfig *integrationsConfig) {
+func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *repositoriesConfig, integrationsConfig *integrationsConfig, dbConfig *dbConfig) {
 	s.TicketsService = func() *services.Tickets {
 		once.Once(func() {
 			s.ticketsService = services.NewTickets()
@@ -23,7 +23,7 @@ func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *re
 
 	s.LongRunningOperationsService = func() *services.LongRunningOperationsService {
 		once.Once(func() {
-			s.longRunningOperationsService = services.NewLongRunningOperationsService(loggerConfig.Logger(), integrationsConfig.NylasClient())
+			s.longRunningOperationsService = services.NewLongRunningOperationsService(loggerConfig.Logger(), integrationsConfig.NylasClient(), dbConfig.DB(), repositoriesConfig.TicketsRepository())
 		})
 		return s.longRunningOperationsService
 	}

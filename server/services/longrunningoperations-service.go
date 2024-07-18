@@ -5,7 +5,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/pleimer/ticketer/server/db"
+	"github.com/pleimer/ticketer/server/ent"
+	"github.com/pleimer/ticketer/server/ent/ticket"
 	"github.com/pleimer/ticketer/server/integration/nylas"
+	"github.com/pleimer/ticketer/server/repositories"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
@@ -18,10 +22,13 @@ var ingestorWorkflowID = "email-ingestor-workflow"
 type LongRunningOperationsService struct {
 	client      client.Client
 	nylasClient *nylas.NylasClient
-	logger      *zap.Logger
+	db          *db.DB
+	ticketsRepo *repositories.TicketsRepository // TODO
+
+	logger *zap.Logger
 }
 
-func NewLongRunningOperationsService(logger *zap.Logger, nylas *nylas.NylasClient) *LongRunningOperationsService {
+func NewLongRunningOperationsService(logger *zap.Logger, nylas *nylas.NylasClient, db *db.DB, ticketsRepo *repositories.TicketsRepository) *LongRunningOperationsService {
 	temporalClient, err := client.Dial(client.Options{})
 	if err != nil {
 		logger.Fatal("dialing temporal cluster", zap.Error(err))
@@ -31,6 +38,8 @@ func NewLongRunningOperationsService(logger *zap.Logger, nylas *nylas.NylasClien
 		client:      temporalClient,
 		nylasClient: nylas,
 		logger:      logger,
+		ticketsRepo: ticketsRepo,
+		db:          db,
 	}
 
 	lro.Start()
@@ -105,15 +114,17 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 		return err
 	}
 
-	// spawn child workflow "fire and forget" style for notifying users of new tickets created in response to their inquiries
-	childWFOpts := workflow.ChildWorkflowOptions{
-		ParentClosePolicy: enums.PARENT_CLOSE_POLICY_ABANDON, // allow child workflow to continue after parent completes
-	}
-	ctx = workflow.WithChildOptions(ctx, childWFOpts)
-	childFuture := workflow.ExecuteChildWorkflow(ctx, lro.TicketCreationAcknowledgementChildWorkflow, processNewMessagesRes)
-	var childWE workflow.Execution
-	if err := childFuture.GetChildWorkflowExecution().Get(ctx, &childWE); err != nil {
-		return err
+	if len(processNewMessagesRes) > 0 {
+		// spawn child workflow "fire and forget" style for notifying users of new tickets created in response to their inquiries
+		childWFOpts := workflow.ChildWorkflowOptions{
+			ParentClosePolicy: enums.PARENT_CLOSE_POLICY_ABANDON, // allow child workflow to continue after parent completes
+		}
+		ctx = workflow.WithChildOptions(ctx, childWFOpts)
+		childFuture := workflow.ExecuteChildWorkflow(ctx, lro.TicketCreationAcknowledgementChildWorkflow, processNewMessagesRes)
+		var childWE workflow.Execution
+		if err := childFuture.GetChildWorkflowExecution().Get(ctx, &childWE); err != nil {
+			return err
+		}
 	}
 
 	// wait for message status update activities to complete
@@ -188,12 +199,52 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 
 	res = []SendTicketCreationAcknowledgementRequest{}
 
+	threadIds := []string{}
+	for _, d := range msgs.Data {
+		threadIds = append(threadIds, d.ThreadID)
+	}
+
+	// entgo upsert does not support 'RETURNING', must query and filter
+	tickets, err := lro.db.Client.Ticket.
+		Query().
+		Where(
+			ticket.ThreadIDIn(threadIds...),
+		).
+		Select(ticket.FieldThreadID).
+		Strings(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	existingSet := map[string]struct{}{}
+	for _, id := range tickets {
+		existingSet[id] = struct{}{}
+	}
+
+	builders := []*ent.TicketCreate{}
 	for _, m := range msgs.Data {
+		if _, ok := existingSet[m.ThreadID]; ok {
+			continue
+		}
+		builders = append(builders,
+			lro.db.Client.Ticket.Create().
+				SetPriority(0).
+				SetThreadID(m.ThreadID).
+				SetTitle(m.Subject).
+				SetStatus(0),
+		)
+
 		res = append(res, SendTicketCreationAcknowledgementRequest{
 			Initiator: m.From[0], // Initial messages resulting in ticket will only have one "from" entry
 			TicketID:  10,
 			MessageID: m.ID,
 		})
+	}
+
+	err = lro.db.Client.Ticket.CreateBulk(builders...).Exec(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	return res, nil
@@ -207,8 +258,7 @@ type SendTicketCreationAcknowledgementRequest struct {
 
 func (lro *LongRunningOperationsService) SendTicketCreationAcknowledgementActivity(ctx context.Context, req SendTicketCreationAcknowledgementRequest) (err error) {
 	_, err = lro.nylasClient.SendMessage(&nylas.SendMessageRequest{
-		Subject: "[Ticketer] New Ticket Created",
-		Body:    "New Ticket Created",
+		Body: "A ticket has been created in response to your inquiry. View updates at: <address>",
 		To: []nylas.Participant{
 			req.Initiator,
 		},

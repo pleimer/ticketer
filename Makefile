@@ -22,7 +22,7 @@ gen-routes:
 	go generate ./server/...
 
 gen-db:
-	go generate ./server/ent
+	go generate ./server/ent 
 
 gen: gen-clients gen-routes gen-db
 
