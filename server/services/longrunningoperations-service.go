@@ -123,7 +123,7 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 			// no need to treat these as workflow failures
 			// if message status update failed, process messages activity will filter
 			// ones out that already resulted in a new ticket.
-			// just log the failure
+			// just log the issue
 			lro.logger.Error("update message status failure", zap.Error(err))
 		}
 	}

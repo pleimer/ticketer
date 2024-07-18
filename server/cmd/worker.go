@@ -30,6 +30,7 @@ func (r *RunWorker) Execute(args []string) error {
 	}
 	defer c.Close()
 
+	// TODO: cleanup registration, can be registered with obj
 	w := worker.New(c, "email-ingestor-taskqueue", worker.Options{})
 	w.RegisterWorkflow(app.LongRunningOperationsService().EmailIngestorWorkflow)
 	w.RegisterWorkflow(app.LongRunningOperationsService().TicketCreationAcknowledgementChildWorkflow)
