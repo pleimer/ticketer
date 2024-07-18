@@ -1,0 +1,4 @@
+package: threadsservice
+generate:
+  models: true
+output: threads-models.gen.go

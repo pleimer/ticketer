@@ -1,0 +1,4 @@
+package: ticketsservice
+generate:
+  models: true
+output: tickets-models.gen.go

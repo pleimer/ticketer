@@ -38,6 +38,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/ogen-go/ogen v0.56.1 // indirect
 	github.com/pborman/uuid v1.2.1 // indirect

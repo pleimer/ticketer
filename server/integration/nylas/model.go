@@ -13,9 +13,9 @@ type Thread struct {
 	Object                    string        `json:"object"`
 	HasAttachments            bool          `json:"has_attachments"`
 	HasDrafts                 bool          `json:"has_drafts"`
-	EarliestMessageDate       int64         `json:"earliest_message_date"`
-	LatestMessageReceivedDate int64         `json:"latest_message_received_date"`
-	LatestMessageSentDate     int64         `json:"latest_message_sent_date"`
+	EarliestMessageDate       int           `json:"earliest_message_date"`
+	LatestMessageReceivedDate int           `json:"latest_message_received_date"`
+	LatestMessageSentDate     int           `json:"latest_message_sent_date"`
 	Participants              []Participant `json:"participants"`
 	Snippet                   string        `json:"snippet"`
 	Starred                   bool          `json:"starred"`

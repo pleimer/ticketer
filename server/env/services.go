@@ -2,28 +2,39 @@ package env
 
 import (
 	"github.com/pleimer/ticketer/server/lib/once"
-	"github.com/pleimer/ticketer/server/services"
+	"github.com/pleimer/ticketer/server/services/threadsservice"
+	"github.com/pleimer/ticketer/server/services/ticketsservice"
 )
 
 type servicesConfig struct {
-	ticketsService *services.Tickets
-	TicketsService func() *services.Tickets
+	threadsService *threadsservice.ThreadsService
+	ThreadsService func() *threadsservice.ThreadsService
 
-	longRunningOperationsService *services.LongRunningOperationsService
-	LongRunningOperationsService func() *services.LongRunningOperationsService
+	ticketsService *ticketsservice.Tickets
+	TicketsService func() *ticketsservice.Tickets
+
+	longRunningOperationsService *ticketsservice.LongRunningOperationsService
+	LongRunningOperationsService func() *ticketsservice.LongRunningOperationsService
 }
 
 func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *repositoriesConfig, integrationsConfig *integrationsConfig, dbConfig *dbConfig) {
-	s.TicketsService = func() *services.Tickets {
+	s.TicketsService = func() *ticketsservice.Tickets {
 		once.Once(func() {
-			s.ticketsService = services.NewTickets(dbConfig.DB(), loggerConfig.Logger())
+			s.ticketsService = ticketsservice.NewTickets(dbConfig.DB(), loggerConfig.Logger())
 		})
 		return s.ticketsService
 	}
 
-	s.LongRunningOperationsService = func() *services.LongRunningOperationsService {
+	s.ThreadsService = func() *threadsservice.ThreadsService {
 		once.Once(func() {
-			s.longRunningOperationsService = services.NewLongRunningOperationsService(loggerConfig.Logger(), integrationsConfig.NylasClient(), dbConfig.DB(), repositoriesConfig.TicketsRepository())
+			s.threadsService = threadsservice.NewThreadsService(loggerConfig.Logger(), integrationsConfig.NylasClient())
+		})
+		return s.threadsService
+	}
+
+	s.LongRunningOperationsService = func() *ticketsservice.LongRunningOperationsService {
+		once.Once(func() {
+			s.longRunningOperationsService = ticketsservice.NewLongRunningOperationsService(loggerConfig.Logger(), integrationsConfig.NylasClient(), dbConfig.DB(), repositoriesConfig.TicketsRepository())
 		})
 		return s.longRunningOperationsService
 	}

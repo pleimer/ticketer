@@ -1,0 +1,227 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Threads API",
+      "version": "0.1.0",
+      "description": "API for retrieving thread information"
+    },
+    "paths": {
+      "/threads/{threadId}": {
+        "get": {
+          "summary": "Get Thread",
+          "description": "Retrieve information about a specific thread",
+          "parameters": [
+            {
+              "name": "threadId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The Thread ID"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ThreadResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "ThreadResponse": {
+          "type": "object",
+          "properties": {
+            "request_id": {
+              "type": "string"
+            },
+            "data": {
+              "$ref": "#/components/schemas/Thread"
+            },
+            "next_cursor": {
+              "type": "string"
+            }
+          }
+        },
+        "Thread": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "has_attachments": {
+              "type": "boolean"
+            },
+            "has_drafts": {
+              "type": "boolean"
+            },
+            "earliest_message_date": {
+              "type": "integer"
+            },
+            "latest_message_received_date": {
+              "type": "integer"
+            },
+            "latest_message_sent_date": {
+              "type": "integer"
+            },
+            "participants": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Participant"
+              }
+            },
+            "snippet": {
+              "type": "string"
+            },
+            "starred": {
+              "type": "boolean"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "unread": {
+              "type": "boolean"
+            },
+            "message_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "draft_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "folders": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "latest_draft_or_message": {
+              "$ref": "#/components/schemas/Message"
+            }
+          }
+        },
+        "Participant": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "Message": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "string"
+            },
+            "cc": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Participant"
+              }
+            },
+            "date": {
+              "type": "integer"
+            },
+            "attachments": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Attachment"
+              }
+            },
+            "folders": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "from": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Participant"
+              }
+            },
+            "id": {
+              "type": "string"
+            },
+            "object": {
+              "type": "string"
+            },
+            "reply_to": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Participant"
+              }
+            },
+            "snippet": {
+              "type": "string"
+            },
+            "starred": {
+              "type": "boolean"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "thread_id": {
+              "type": "string"
+            },
+            "to": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Participant"
+              }
+            },
+            "unread": {
+              "type": "boolean"
+            }
+          }
+        },
+        "Attachment": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "content_type": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "filename": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "securitySchemes": {
+        "BearerAuth": {
+          "type": "http",
+          "scheme": "bearer"
+        }
+      }
+    }
+  }
