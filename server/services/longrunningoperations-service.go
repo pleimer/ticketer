@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/pleimer/ticketer/server/integration/nylas"
+	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
@@ -72,7 +73,6 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 	retrypolicy := &temporal.RetryPolicy{
 		InitialInterval:    time.Second,
 		BackoffCoefficient: 2.0,
-		MaximumInterval:    100 * time.Second,
 		MaximumAttempts:    5,
 	}
 
@@ -93,10 +93,11 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 		return err
 	}
 
-	// No need to wait on update message status. If this fails, new messages that have already
-	// been processed will be filtered our in the process messages activity in the next workflow
-	// run
-	workflow.ExecuteActivity(ctx, lro.UpdateMessageReadStatusActivity)
+	// run update message statuses async
+	updateStatusFutures := []workflow.Future{}
+	for _, msg := range newMessagesResp.Data {
+		updateStatusFutures = append(updateStatusFutures, workflow.ExecuteActivity(ctx, lro.UpdateMessageReadStatusActivity, msg.ID))
+	}
 
 	var processNewMessagesRes []SendTicketCreationAcknowledgementRequest
 	err = workflow.ExecuteActivity(ctx, lro.ProcessNewMessagesActivity, newMessagesResp).Get(ctx, &processNewMessagesRes)
@@ -104,9 +105,35 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 		return err
 	}
 
-	// send response to users where inquiries resulted in new ticket being created
+	// spawn child workflow "fire and forget" style for notifying users of new tickets created in response to their inquiries
+	childWFOpts := workflow.ChildWorkflowOptions{
+		ParentClosePolicy: enums.PARENT_CLOSE_POLICY_ABANDON, // allow child workflow to continue after parent completes
+	}
+	ctx = workflow.WithChildOptions(ctx, childWFOpts)
+	childFuture := workflow.ExecuteChildWorkflow(ctx, lro.TicketCreationAcknowledgementChildWorkflow, processNewMessagesRes)
+	var childWE workflow.Execution
+	if err := childFuture.GetChildWorkflowExecution().Get(ctx, &childWE); err != nil {
+		return err
+	}
 
-	// retry policy for failed sends will be much longer
+	// wait for message status update activities to complete
+	for _, f := range updateStatusFutures {
+		err = f.Get(ctx, nil)
+		if err != nil {
+			// no need to treat these as workflow failures
+			// if message status update failed, process messages activity will filter
+			// ones out that already resulted in a new ticket.
+			// just log the failure
+			lro.logger.Error("update message status failure", zap.Error(err))
+		}
+	}
+
+	return nil
+}
+
+func (lro *LongRunningOperationsService) TicketCreationAcknowledgementChildWorkflow(ctx workflow.Context, processNewMessagesRes []SendTicketCreationAcknowledgementRequest) (err error) {
+
+	// since this workflow runs as "fire and forget", retries can happen for a much longer period of time for message send failures
 	sendAckActivityOptions := workflow.ActivityOptions{
 		StartToCloseTimeout: time.Minute,
 		RetryPolicy: &temporal.RetryPolicy{
@@ -119,10 +146,20 @@ func (lro *LongRunningOperationsService) EmailIngestorWorkflow(ctx workflow.Cont
 
 	ctx = workflow.WithActivityOptions(ctx, sendAckActivityOptions)
 
-	// thus, do not block the the current workflow
+	futures := []workflow.Future{}
+
 	for _, r := range processNewMessagesRes {
-		workflow.ExecuteActivity(ctx, lro.SendTicketCreationAcknowledgementActivity, r)
+		futures = append(futures, workflow.ExecuteActivity(ctx, lro.SendTicketCreationAcknowledgementActivity, r))
 	}
+
+	for _, f := range futures {
+		err = f.Get(ctx, nil)
+		if err != nil {
+			// log failures, but not much else can be done after retries exhausted
+			lro.logger.Error("sending message failure", zap.Error(err))
+		}
+	}
+
 	return nil
 }
 
@@ -134,26 +171,13 @@ func (lro *LongRunningOperationsService) QueryNewMessagesActivity(ctx context.Co
 		return nil, errors.Wrap(err, "retrieving messages from nylas")
 	}
 
-	// mark messages as read
-
 	return msgs, nil
 }
 
 // UpdateMessageReadStatusActivity updates status of messages to 'read'
-func (lro *LongRunningOperationsService) UpdateMessageReadStatusActivity(ctx context.Context, msgs *nylas.MessagesResponse) error {
-
-	if msgs == nil {
-		return nil
-	}
-
-	for _, d := range msgs.Data {
-		_, err := lro.nylasClient.UpdateMessageReadStatus(d.ID, false)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+func (lro *LongRunningOperationsService) UpdateMessageReadStatusActivity(ctx context.Context, messageID string) (err error) {
+	_, err = lro.nylasClient.UpdateMessageReadStatus(messageID, false)
+	return err
 }
 
 // ProcessNewMessagesActivity creates or updates tickets for incoming messages
