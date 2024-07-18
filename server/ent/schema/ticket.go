@@ -17,14 +17,17 @@ func (Ticket) Fields() []ent.Field {
 		field.String("title"),
 		field.String("assignee").
 			Optional().Nillable(),
-		field.String("opened_by"),
 		field.Enum("status").
 			Values("not_started", "in_progress", "done").
 			Default("not_started"),
 		field.Enum("priority").
 			Values("low", "medium", "high").
 			Default("low"),
-		field.String("threadID"),
+		field.String("thread_id"),
+		field.Time("created_at"),
+		field.Time("updated_at"),
+		field.String("created_by"),
+		field.String("updated_by"),
 	}
 }
 
@@ -36,6 +39,6 @@ func (Ticket) Edges() []ent.Edge {
 // Edges of the Ticket.
 func (Ticket) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("threadID"),
+		index.Fields("thread_id"),
 	}
 }
