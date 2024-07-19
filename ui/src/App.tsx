@@ -4,6 +4,9 @@ import Box from "@mui/material/Box";
 import { useListTicket } from "./clients/tickets/tickets";
 import { ListTicketStatus } from "./clients/tickets/models/listTicketStatus";
 import { Button, ButtonGroup } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+
+
 
 export default function App() {
 
@@ -14,15 +17,16 @@ export default function App() {
 
   const {data: inProgressTickets} = useListTicket({
     status: ListTicketStatus.in_progress,
-  },{
   })
+
+  const nav = useNavigate()
 
   return (
     <Container maxWidth="sm">
       {notStartedTickets?.data?.map((ticket) => {
         return <Box key={ticket.id} sx={{ my: 4 }}>
           <ButtonGroup>
-            <Button onClick={() => console.log("clicked")}>
+            <Button onClick={() => nav(`ticket/${ticket.id}`)}>
               <p>{`# ${ticket.id}`}</p>
               <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
                 {ticket.title}
