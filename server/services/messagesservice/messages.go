@@ -43,5 +43,7 @@ func (t *MessagesService) GetThreadsThreadId(ctx echo.Context, threadId string) 
 		t.Fatal("mismatched structs")
 	}
 
+	// TODO: call ListMessages nylas API for message objects
+
 	return ctx.JSON(http.StatusOK, reply)
 }

@@ -59,7 +59,7 @@ type Ticket struct {
 	OpenedBy string         `json:"opened_by"`
 	Priority TicketPriority `json:"priority"`
 	Status   TicketStatus   `json:"status"`
-	ThreadID string         `json:"threadID"`
+	ThreadId string         `json:"thread_id"`
 	Title    string         `json:"title"`
 }
 
@@ -118,7 +118,7 @@ type CreateTicketJSONBody struct {
 	OpenedBy string                       `json:"opened_by"`
 	Priority CreateTicketJSONBodyPriority `json:"priority"`
 	Status   CreateTicketJSONBodyStatus   `json:"status"`
-	ThreadID string                       `json:"threadID"`
+	ThreadId string                       `json:"thread_id"`
 	Title    string                       `json:"title"`
 }
 
@@ -134,7 +134,7 @@ type UpdateTicketJSONBody struct {
 	OpenedBy *string                       `json:"opened_by,omitempty"`
 	Priority *UpdateTicketJSONBodyPriority `json:"priority,omitempty"`
 	Status   *UpdateTicketJSONBodyStatus   `json:"status,omitempty"`
-	ThreadID *string                       `json:"threadID,omitempty"`
+	ThreadId *string                       `json:"thread_id,omitempty"`
 	Title    *string                       `json:"title,omitempty"`
 }
 

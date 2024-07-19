@@ -69,7 +69,7 @@ func (t *Tickets) ListTicket(ctx echo.Context, params ListTicketParams) error {
 			Id:       t.ID,
 			Priority: TicketPriority(t.Priority),
 			Status:   TicketStatus(t.Status),
-			ThreadID: t.ThreadID,
+			ThreadId: t.ThreadID,
 			Title:    t.Title,
 		})
 	}
@@ -142,8 +142,8 @@ func (t *Tickets) UpdateTicket(ctx echo.Context, id int) error {
 	if updateData.Priority != nil {
 		update = update.SetPriority(ticket.Priority(*updateData.Priority))
 	}
-	if updateData.ThreadID != nil {
-		update = update.SetThreadID(*updateData.ThreadID)
+	if updateData.ThreadId != nil {
+		update = update.SetThreadID(*updateData.ThreadId)
 	}
 	if updateData.OpenedBy != nil {
 		update = update.SetCreatedBy(*updateData.OpenedBy)

@@ -25,6 +25,7 @@ func NewNylasClient(cfg NylasClientConfig) *NylasClient {
 	}
 }
 
+// ListThreadMessages given a threadID, list all messages in the thread
 func (c *NylasClient) ListThreadMessages(threadID string) (*ThreadResponse, error) {
 	path := fmt.Sprintf("/v3/grants/%s/threads/%s", c.httpClient.grantID, threadID)
 

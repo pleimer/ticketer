@@ -9,14 +9,15 @@ export const Ticket = () => {
 
     const {data: ticket} = useReadTicket(Number(id))
 
-    const threadResp = useGetThreadsThreadId(ticket?.data?.threadID!, {
+    const threadResp = useGetThreadsThreadId(ticket?.data?.thread_id!, {
         query: {
-            enabled: !!ticket?.data?.threadID!!,
+            enabled: !!ticket?.data?.thread_id!!,
         }  
     })
 
     // useGetThreadsThreadId()
 
+    console.log(threadResp.data)
 
     return <div>
         <div>{`Ticket ${ticket?.data?.title}`}</div>
@@ -24,8 +25,9 @@ export const Ticket = () => {
         <div>{`Ticket ${ticket?.data?.assignee}`}</div>
         <div>{`Ticket ${ticket?.data?.opened_by}`}</div>
         <div>{`Ticket ${ticket?.data?.priority}`}</div>
-        <div>{`ThreadID ${ticket?.data?.threadID}`}</div>
+        <div>{`ThreadID ${ticket?.data?.thread_id}`}</div>
+
         <h1>Thread Info</h1>
-        <div>{threadResp?.data?.data?.data?.message_ids}</div>
+        {/* <div>{threadResp?.data?.data?.data}</div> */}
     </div>
 }
