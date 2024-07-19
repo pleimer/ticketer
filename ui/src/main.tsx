@@ -9,6 +9,7 @@ import axios from 'axios';
 
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
 } from "react-router-dom";
 import { Ticket } from "./Ticket";
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
     path: "ticket/:id",
     element: <Ticket />
   },
+  {
+    path: "*",
+    element: <Navigate to="/" replace />
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
