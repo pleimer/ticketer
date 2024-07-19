@@ -7,17 +7,34 @@ import App from "./App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import axios from 'axios';
 
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
 // Set default base URL
 axios.defaults.baseURL = 'http://localhost:8080';
 
 const queryClient = new QueryClient();
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (<App />),
+  },
+  {
+    path: "ticket",
+    element: <div>Ticket</div>,
+  },
+]);
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <App />
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>
