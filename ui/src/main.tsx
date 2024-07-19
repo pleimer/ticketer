@@ -11,6 +11,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { Ticket } from "./Ticket";
 
 // Set default base URL
 axios.defaults.baseURL = 'http://localhost:8080';
@@ -24,10 +25,9 @@ const router = createBrowserRouter([
   },
   {
     path: "ticket/:id",
-    element: <div>Ticket</div>,
+    element: <Ticket />
   },
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
