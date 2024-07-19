@@ -3,7 +3,6 @@ package ticketsservice
 import (
 	"net/http"
 
-	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
 	"github.com/pleimer/ticketer/server/db"
 	"github.com/pleimer/ticketer/server/ent"
@@ -64,12 +63,6 @@ func (t *Tickets) ListTicket(ctx echo.Context, params ListTicketParams) error {
 	// Convert ent.Ticket to models.Ticket
 	var response []Ticket
 
-	copier.Copy(&tickets, &response)
-	if err != nil {
-		// dev error
-		t.logger.Fatal("mismatched structs")
-	}
-
 	for _, t := range tickets {
 		response = append(response, Ticket{
 			Assignee: t.Assignee,
@@ -99,7 +92,13 @@ func (t *Tickets) DeleteTicket(ctx echo.Context, id int) error {
 // Find a Ticket by ID
 // (GET /tickets/{id})
 func (t *Tickets) ReadTicket(ctx echo.Context, id int) error {
-	panic("not implemented") // TODO: Implement
+
+	ticket, err := t.db.Client.Ticket.Get(ctx.Request().Context(), id)
+	if err != nil {
+		t.logger.Error("querying ticket", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed retrieving ticket")
+	}
+	return ctx.JSON(http.StatusOK, ticket)
 }
 
 // Updates a Ticket
