@@ -2,6 +2,7 @@ package ticketsservice
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -229,6 +230,9 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 		existingSet[id] = struct{}{}
 	}
 
+	// thread to message
+	threadsSet := map[string]nylas.Message{}
+
 	builders := []*ent.TicketCreate{}
 	for _, m := range msgs.Data {
 		if _, ok := existingSet[m.ThreadID]; ok {
@@ -242,16 +246,20 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 				SetCreatedBy(m.From[0].Email),
 		)
 
-		res = append(res, SendTicketCreationAcknowledgementRequest{
-			Initiator: m.From[0], // Initial messages resulting in ticket will only have one "from" entry
-			TicketID:  10,
-			MessageID: m.ID,
-		})
+		threadsSet[m.ThreadID] = m
 	}
 
-	err = tx.Ticket.CreateBulk(builders...).Exec(ctx)
+	created, err := tx.Ticket.CreateBulk(builders...).Save(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, c := range created {
+		res = append(res, SendTicketCreationAcknowledgementRequest{
+			Initiator: threadsSet[c.ThreadID].From[0], // Initial messages resulting in ticket will only have one "from" entry
+			TicketID:  c.ID,
+			MessageID: threadsSet[c.ThreadID].ID,
+		})
 	}
 
 	// commit
@@ -270,7 +278,8 @@ type SendTicketCreationAcknowledgementRequest struct {
 
 func (lro *LongRunningOperationsService) SendTicketCreationAcknowledgementActivity(ctx context.Context, req SendTicketCreationAcknowledgementRequest) (err error) {
 	_, err = lro.nylasClient.SendMessage(&nylas.SendMessageRequest{
-		Body: "A ticket has been created in response to your inquiry. View updates at: <address>",
+		// Address should come from configuration
+		Body: fmt.Sprintf("A ticket has been created in response to your inquiry. View updates at: http://localhost:8080/ticket/%d", req.TicketID),
 		To: []nylas.Participant{
 			req.Initiator,
 		},
