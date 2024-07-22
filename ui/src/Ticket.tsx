@@ -80,7 +80,6 @@ export const Ticket = () => {
                   <Chip
                     label={`Status: ${ticket.status}`}
                     color="primary"
-                    // onClick={handleClick}
                     onDelete={handleClick}
                     deleteIcon={<ArrowDropDownIcon />}
                     sx={{ mb: 1 }}
@@ -96,7 +95,13 @@ export const Ticket = () => {
                       </MenuItem>
                     ))}
                   </Menu>
-                  <Chip label={`Priority: ${ticket.priority}`} color={ticket.priority == TicketPriority.high ? "warning": "secondary"} sx={{ mb: 1}} />
+                  <Chip 
+                    label={`Priority: ${ticket.priority}`} 
+                    color={ticket.priority == TicketPriority.high ? "warning": "secondary"} 
+                    onDelete={handleClick}
+                    deleteIcon={<ArrowDropDownIcon />}
+                    sx={{ mb: 1}}
+                  />
                   <Typography variant="body2" align="right">
                     Created by: {ticket.created_by?.split("@")[0]}
                   </Typography>
