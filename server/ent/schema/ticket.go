@@ -26,6 +26,7 @@ func (Ticket) Fields() []ent.Field {
 			Values("low", "medium", "high").
 			Default("low"),
 		field.String("thread_id"),
+		// field.String("description"),
 		field.Time("created_at").
 			Default(time.Now),
 		field.Time("updated_at").

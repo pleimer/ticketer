@@ -46,7 +46,9 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, onCardClick }) => {
                   </Typography>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                     <Chip label={`Status: ${ticket.status}`} color="primary" size="small" />
-                    <Chip label={`Priority: ${ticket.priority}`} color={ticket.priority == TicketPriority.high ? "warning": "secondary"} size="small" />
+                    <Chip label={`Priority: ${ticket.priority}`} 
+                      color={ticket.priority == TicketPriority.high ? "error": ticket.priority == TicketPriority.medium ? "warning": "secondary"} 
+                      size="small" />
                   </Box>
                   <List dense>
                     <ListItemText 

@@ -8,6 +8,7 @@ import { ChangeEvent, Suspense, useState } from "react"
 // import EdiText from 'react-editext'
 import { Messages } from "./Messages";
 
+
 export const Ticket = () => {
     const {id} =  useParams()
 
@@ -93,7 +94,7 @@ const TicketContent = ({id}: {id: number}) => {
 
               <Chip 
                 label={`Priority: ${ticket.priority}`} 
-                color={ticket.priority == TicketPriority.high ? "warning": "secondary"} 
+                color={ticket.priority == TicketPriority.high ? "error": ticket.priority == TicketPriority.medium ? "warning": "secondary"} 
                 onDelete={(event: React.MouseEvent<HTMLButtonElement>) => setAnchorPriorityEl(event.currentTarget)}
                 deleteIcon={<ArrowDropDownIcon />}
                 sx={{ mb: 1}}
@@ -162,17 +163,18 @@ const Assignee = ({assignee, ticketId, refetchFn}: AssigneeProps) => {
     <div>
       <Chip
         label={`Assignee: ${assignee || "None"}`}
-        onClick={(e) => setAnchor(e.currentTarget)}
+        onDelete={(e) => setAnchor(e.currentTarget)}
+        deleteIcon={<ArrowDropDownIcon />}
       />
       <Popover 
         id="simpole-popover"
         open={open} 
         onClose={handleClose}
+        anchorEl={anchor}
         anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
-
       >
         <TextField 
           id="outlined-basic" 
