@@ -81,7 +81,7 @@ export const Messages = ({threadID}: MessagesProps) => {
                 multiline
                 rows={3}
                 variant="outlined"
-                placeholder="Write a comment..."
+                placeholder="Send a message..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 sx={{ mr: 1 }}

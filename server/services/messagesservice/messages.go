@@ -12,7 +12,10 @@ import (
 //go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=messages-models.cfg.yaml ../../../internal/api/messages.json
 //go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=messages-service.cfg.yaml ../../../internal/api/messages.json
 
-// MessagesService is just a Nylas api passthrough
+// MessagesService - right now, this is merely a Nylas api passthrough. In a real production application,
+// I would likely want to store some messaging data in our application DB so that it can be queried quicker
+// and reduce load on a mail server. However, in that case, it's important to take care about data duplication
+// and syncing issues that can occur where there is crossover between two data models
 type MessagesService struct {
 	nylasCli *nylas.NylasClient
 	*zap.Logger
@@ -66,7 +69,7 @@ func (t *MessagesService) ListThreadMessages(ctx echo.Context, threadId string) 
 	return ctx.JSON(http.StatusOK, reply)
 }
 
-// reply to thread
+// reply to thread - currently a fairly fragile function due to the passthrough nature of this client
 // (POST /threads/reply)
 func (t *MessagesService) ReplyToThread(ctx echo.Context) error {
 
