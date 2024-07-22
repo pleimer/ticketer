@@ -15,25 +15,12 @@ export const Ticket = () => {
 
     const {data: {data: ticket = {} as TicketModel} = {}} = useReadTicket(Number(id))
 
-    // const threadResp = useGetThreadsThreadId(ticket?.data?.thread_id!, {
-    //     query: {
-    //         enabled: !!ticket?.data?.thread_id!!,
-    //     }  
-    // })
-
-
-    // useGetThreadsThreadId()
-
     const {data: {data: messages = [] as MessageModel[]} = {}} = useListThreadMessages(ticket.thread_id, {
       query: {
         enabled: !!ticket.thread_id,
       }
     })
 
-
-    // const ticket = useTicket(id); // Custom hook to fetch ticket details
-    // const comments = useComments(ticket?.thread_id) || [];
-  
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -44,17 +31,14 @@ export const Ticket = () => {
     };
 
     const handleCommentSubmit = () => {
-        console.log('Submitting comment:', newComment);
-        setNewComment('');
-      };
+      setNewComment('');
+    };
   
     const handleClose = () => {
       setAnchorEl(null);
     };
   
     const handleStatusChange = (newStatus: TicketStatus) => {
-      // Implement status change logic here
-      console.log(`Changing status to: ${newStatus}`);
       handleClose();
     };
   
