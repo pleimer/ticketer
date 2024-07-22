@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom"
 import { useGetThreadsThreadId } from "./clients/messages/messages"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useReadTicket } from "./clients/tickets/tickets"
-import { TicketStatus, Ticket as TicketModel} from "./clients/tickets/models"
+import { TicketStatus, Ticket as TicketModel, TicketPriority} from "./clients/tickets/models"
 import { Message as MessageModel} from "./clients/messages/models"
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Button, Card, CardContent, CardHeader, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, Menu, MenuItem, TextField, Typography } from "@mui/material"
@@ -66,7 +66,7 @@ export const Ticket = () => {
               {ticket.title}
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              ID: {ticket.id}
+              # {ticket.id}
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={8}>
@@ -96,9 +96,9 @@ export const Ticket = () => {
                       </MenuItem>
                     ))}
                   </Menu>
-                  <Chip label={`Priority: ${ticket.priority}`} color="secondary" sx={{ mb: 1 }} />
+                  <Chip label={`Priority: ${ticket.priority}`} color={ticket.priority == TicketPriority.high ? "warning": "secondary"} sx={{ mb: 1}} />
                   <Typography variant="body2" align="right">
-                    Created by: {ticket.created_by}
+                    Created by: {ticket.created_by?.split("@")[0]}
                   </Typography>
                 </Box>
               </Grid>
@@ -106,10 +106,10 @@ export const Ticket = () => {
             <Divider sx={{ my: 2 }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="body2" color="text.secondary">
-                Updated at: {new Date(ticket.updated_at).toLocaleString()}
+                Last updated: {new Date(ticket.updated_at).toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Updated by: {ticket.updated_by}
+                Updated by: {ticket.updated_by?.split("@")[0]}
               </Typography>
             </Box>
           </CardContent>
