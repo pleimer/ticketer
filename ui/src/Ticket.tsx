@@ -113,14 +113,9 @@ const TicketContent = ({id}: {id: number}) => {
                 onClose={() => setAnchorPriorityEl(null)}
               />
 
-              {/* <Typography variant="body2" align="right"> */}
-                {/* Assignee:  */}
-                {/* <EdiText
-                  type="text" 
-                  value={ticket.assignee || "None"}
-                  onSave={() => {}}
-                /> */}
-              {/* </Typography> */}
+              <Typography variant="body2" align="right">
+                Assignee: {ticket.assignee || "None"}
+              </Typography>
               <Typography variant="body2" align="right">
                 Created by: {ticket.created_by?.split("@")[0]}
               </Typography>
