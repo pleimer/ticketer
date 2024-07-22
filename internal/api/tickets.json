@@ -16,20 +16,6 @@
         "operationId": "listTicket",
         "parameters": [
           {
-            "name": "status",
-            "in": "query",
-            "description": "ticket status filter",
-            "schema": {
-              "type": "string",
-              "minimum": 0,
-              "enum": [
-                "not_started",
-                "in_progress",
-                "done"
-              ]
-            }
-          },
-          {
             "name": "page",
             "in": "query",
             "description": "what page to render",
@@ -97,9 +83,6 @@
                   "assignee": {
                     "type": "string"
                   },
-                  "opened_by": {
-                    "type": "string"
-                  },
                   "status": {
                     "type": "string",
                     "enum": [
@@ -120,14 +103,31 @@
                   },
                   "thread_id": {
                     "type": "string"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  },
+                  "updated_by": {
+                    "type": "string"
                   }
                 },
                 "required": [
                   "title",
-                  "opened_by",
                   "status",
                   "priority",
-                  "thread_id"
+                  "thread_id",
+                  "created_at",
+                  "updated_at",
+                  "created_by",
+                  "updated_by"
                 ]
               }
             }
@@ -268,9 +268,6 @@
                   "assignee": {
                     "type": "string"
                   },
-                  "opened_by": {
-                    "type": "string"
-                  },
                   "status": {
                     "type": "string",
                     "enum": [
@@ -290,6 +287,20 @@
                     "default": "low"
                   },
                   "thread_id": {
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  },
+                  "updated_by": {
                     "type": "string"
                   }
                 }
@@ -339,9 +350,6 @@
           "assignee": {
             "type": "string"
           },
-          "opened_by": {
-            "type": "string"
-          },
           "status": {
             "type": "string",
             "enum": [
@@ -362,15 +370,32 @@
           },
           "thread_id": {
             "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "title",
-          "opened_by",
           "status",
           "priority",
-          "thread_id"
+          "thread_id",
+          "created_at",
+          "updated_at",
+          "created_by",
+          "updated_by"
         ]
       }
     },

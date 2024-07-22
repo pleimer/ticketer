@@ -19,7 +19,7 @@ gen-clients:
 	npx orval --config ./ui/orval.config.ts
 
 gen-server:
-	go generate ./server/...
+	go generate ./server/... && ./internal/api/adjust_generated_schema.py
 
 # gen-db:
 # 	go generate ./server/ent 

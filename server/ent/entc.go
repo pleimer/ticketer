@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	file, err := os.Create("../../internal/api/tickets_v2.json")
+	file, err := os.Create("../../internal/api/tickets_broken.json")
 	if err != nil {
 		log.Fatalf("Error opening file: %w", err)
 		return
