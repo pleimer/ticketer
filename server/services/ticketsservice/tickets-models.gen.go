@@ -58,16 +58,17 @@ const (
 
 // Ticket defines model for Ticket.
 type Ticket struct {
-	Assignee  *string        `json:"assignee,omitempty"`
-	CreatedAt time.Time      `json:"created_at"`
-	CreatedBy string         `json:"created_by"`
-	Id        int            `json:"id"`
-	Priority  TicketPriority `json:"priority"`
-	Status    TicketStatus   `json:"status"`
-	ThreadId  string         `json:"thread_id"`
-	Title     string         `json:"title"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	UpdatedBy string         `json:"updated_by"`
+	Assignee    *string        `json:"assignee,omitempty"`
+	CreatedAt   time.Time      `json:"created_at"`
+	CreatedBy   string         `json:"created_by"`
+	Description *string        `json:"description,omitempty"`
+	Id          int            `json:"id"`
+	Priority    TicketPriority `json:"priority"`
+	Status      TicketStatus   `json:"status"`
+	ThreadId    string         `json:"thread_id"`
+	Title       string         `json:"title"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	UpdatedBy   string         `json:"updated_by"`
 }
 
 // TicketPriority defines model for Ticket.Priority.

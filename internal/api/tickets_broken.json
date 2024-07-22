@@ -104,6 +104,9 @@
                   "thread_id": {
                     "type": "string"
                   },
+                  "description": {
+                    "type": "string"
+                  },
                   "created_at": {
                     "type": "string",
                     "format": "date-time"
@@ -289,6 +292,9 @@
                   "thread_id": {
                     "type": "string"
                   },
+                  "description": {
+                    "type": "string"
+                  },
                   "created_at": {
                     "type": "string",
                     "format": "date-time"
@@ -369,6 +375,9 @@
             "default": "low"
           },
           "thread_id": {
+            "type": "string"
+          },
+          "description": {
             "type": "string"
           },
           "created_at": {

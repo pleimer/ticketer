@@ -243,6 +243,7 @@ func (lro *LongRunningOperationsService) ProcessNewMessagesActivity(ctx context.
 				SetThreadID(m.ThreadID).
 				SetTitle(m.Subject).
 				SetUpdatedBy(m.From[0].Email).
+				SetDescription(m.Body).
 				SetCreatedBy(m.From[0].Email),
 		)
 

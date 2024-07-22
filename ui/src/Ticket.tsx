@@ -71,8 +71,7 @@ const TicketContent = ({id}: {id: number}) => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={8}>
             <Typography variant="body1" paragraph>
-              {/* {ticket.description} */}
-              TODO: add ticket descriptions
+              {ticket.description}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
