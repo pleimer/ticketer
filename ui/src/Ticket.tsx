@@ -24,7 +24,7 @@ export const Ticket = () => {
 }
 
 const TicketContent = ({id}: {id: number}) => {
-  const {data: {data: ticket = {} as TicketModel} = {}} =  useReadTicketSuspense(Number(id))
+  const {data: {data: ticket = {} as TicketModel} = {}, error} =  useReadTicketSuspense(Number(id))
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -48,6 +48,8 @@ const TicketContent = ({id}: {id: number}) => {
   };
 
   return (
+    error ? "error fetching ticket data" :
+    // TODO: error boundaries
     <>
     <Card sx={{ mb: 4 }}>
       <CardContent>
@@ -92,6 +94,9 @@ const TicketContent = ({id}: {id: number}) => {
                 sx={{ mb: 1}}
               />
               <Typography variant="body2" align="right">
+                Assignee: {ticket.assignee || "None"}
+              </Typography>
+              <Typography variant="body2" align="right">
                 Created by: {ticket.created_by?.split("@")[0]}
               </Typography>
             </Box>
@@ -112,6 +117,7 @@ const TicketContent = ({id}: {id: number}) => {
     <Typography variant="h5" gutterBottom>
       Messages
     </Typography>
+
     <Suspense fallback={<CircularProgress color="secondary" />} >
       <Messages threadID={ticket.thread_id}/>
     </Suspense>
