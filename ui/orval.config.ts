@@ -10,6 +10,10 @@ export default defineConfig({
         baseUrl: '/api/v1/tickets',
         client: 'react-query',
         override: {
+          query: {
+            useQuery: true,
+            useSuspenseQuery: true,
+          },
           components: {
             responses: {
               suffix: ""
@@ -26,6 +30,10 @@ export default defineConfig({
         baseUrl: '/api/v1/messages',
         client: 'react-query',
         override: {
+          query: {
+            useQuery: true,
+            useSuspenseQuery: true,
+          },
           components: {
             responses: {
               suffix: ""
