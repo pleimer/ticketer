@@ -19,6 +19,6 @@ export default function App() {
   const nav = useNavigate()
 
   return (
-    <TicketList tickets={tickets?.data || []} />
+    <TicketList tickets={tickets?.data || []} onCardClick={(t) => nav(`/ticket/${t.id}`)} />
   );
 }
