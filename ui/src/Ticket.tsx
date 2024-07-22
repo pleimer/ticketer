@@ -123,7 +123,10 @@ export const Ticket = () => {
                   {message.date ? new Date(message.date).toLocaleString() : 'No date'}
                 </Typography>
                 <Divider sx={{ my: 1 }} />
-                <Typography variant="body1">
+                <Typography 
+                  variant="body1"
+                  sx={{ whiteSpace: 'pre-wrap' }}
+                >
                   {message.snippet || 'No content'}
                 </Typography>
               </CardContent>
