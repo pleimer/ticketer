@@ -21,6 +21,13 @@ const (
 	TicketStatusNotStarted TicketStatus = "not_started"
 )
 
+// Defines values for Status.
+const (
+	StatusDone       Status = "done"
+	StatusInProgress Status = "in_progress"
+	StatusNotStarted Status = "not_started"
+)
+
 // Defines values for CreateTicketJSONBodyPriority.
 const (
 	CreateTicketJSONBodyPriorityHigh   CreateTicketJSONBodyPriority = "high"
@@ -44,9 +51,9 @@ const (
 
 // Defines values for UpdateTicketJSONBodyStatus.
 const (
-	Done       UpdateTicketJSONBodyStatus = "done"
-	InProgress UpdateTicketJSONBodyStatus = "in_progress"
-	NotStarted UpdateTicketJSONBodyStatus = "not_started"
+	UpdateTicketJSONBodyStatusDone       UpdateTicketJSONBodyStatus = "done"
+	UpdateTicketJSONBodyStatusInProgress UpdateTicketJSONBodyStatus = "in_progress"
+	UpdateTicketJSONBodyStatusNotStarted UpdateTicketJSONBodyStatus = "not_started"
 )
 
 // Ticket defines model for Ticket.
@@ -68,6 +75,9 @@ type TicketPriority string
 
 // TicketStatus defines model for Ticket.Status.
 type TicketStatus string
+
+// Status defines model for status.
+type Status string
 
 // Resp400 defines model for resp400.
 type Resp400 struct {
@@ -99,6 +109,9 @@ type Resp500 struct {
 
 // ListTicketParams defines parameters for ListTicket.
 type ListTicketParams struct {
+	// Status ticket status to filter on
+	Status *[]Status `form:"status[],omitempty" json:"status[],omitempty"`
+
 	// Page what page to render
 	Page *int `form:"page,omitempty" json:"page,omitempty"`
 

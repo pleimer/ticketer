@@ -16,6 +16,18 @@
         "operationId": "listTicket",
         "parameters": [
           {
+            "name": "status[]",
+            "in": "query",
+            "description": "ticket status to filter on",
+            "explode": true,
+            "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/status"
+                }
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "description": "what page to render",
@@ -338,6 +350,10 @@
   },
   "components": {
     "schemas": {
+      "status": {
+        "type": "string",
+        "enum": ["in_progress","done","not_started"]
+      },
       "Ticket": {
         "type": "object",
         "properties": {

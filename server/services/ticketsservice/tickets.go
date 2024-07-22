@@ -46,7 +46,12 @@ func (t *Tickets) ListTicket(ctx echo.Context, params ListTicketParams) error {
 
 	// Add status filter if provided
 	if params.Status != nil {
-		query = query.Where(ticket.StatusEQ(ticket.Status(*params.Status)))
+		statuses := []ticket.Status{}
+		for _, s := range *params.Status {
+			statuses = append(statuses, ticket.Status(s))
+		}
+
+		query = query.Where(ticket.StatusIn(statuses...))
 	}
 
 	// Execute the query with pagination
@@ -65,12 +70,16 @@ func (t *Tickets) ListTicket(ctx echo.Context, params ListTicketParams) error {
 
 	for _, t := range tickets {
 		response = append(response, Ticket{
-			Assignee: t.Assignee,
-			Id:       t.ID,
-			Priority: TicketPriority(t.Priority),
-			Status:   TicketStatus(t.Status),
-			ThreadId: t.ThreadID,
-			Title:    t.Title,
+			Assignee:  t.Assignee,
+			CreatedAt: t.CreatedAt,
+			CreatedBy: t.CreatedBy,
+			Id:        t.ID,
+			Priority:  TicketPriority(t.Priority),
+			Status:    TicketStatus(t.Status),
+			ThreadId:  t.ThreadID,
+			Title:     t.Title,
+			UpdatedAt: t.UpdatedAt,
+			UpdatedBy: t.UpdatedBy,
 		})
 	}
 
@@ -145,8 +154,8 @@ func (t *Tickets) UpdateTicket(ctx echo.Context, id int) error {
 	if updateData.ThreadId != nil {
 		update = update.SetThreadID(*updateData.ThreadId)
 	}
-	if updateData.OpenedBy != nil {
-		update = update.SetCreatedBy(*updateData.OpenedBy)
+	if updateData.UpdatedBy != nil {
+		update = update.SetCreatedBy(*updateData.UpdatedBy)
 	}
 
 	// Save the changes
