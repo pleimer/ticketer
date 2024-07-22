@@ -6,6 +6,8 @@ import (
 	"net/url"
 )
 
+// TODO: need to use a request context for this client since it may be used as a part of regular requests
+
 // Nylas API documentatino: https://developer.nylas.com/docs/v3/email/#add-labels-to-email-messages
 
 type NylasClientConfig struct {
@@ -30,6 +32,7 @@ func (c *NylasClient) ListThreadMessages(threadID string) (*MessagesResponse, er
 	path := fmt.Sprintf("/v3/grants/%s/messages", c.httpClient.grantID)
 	query := url.Values{}
 	query.Set("thread_id", threadID)
+	query.Set("thread_id", threadID)
 
 	responseBody, err := c.httpClient.doRequest("GET", path, query, nil)
 	if err != nil {
@@ -37,6 +40,40 @@ func (c *NylasClient) ListThreadMessages(threadID string) (*MessagesResponse, er
 	}
 
 	var messagesResp MessagesResponse
+	if err := json.Unmarshal(responseBody, &messagesResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &messagesResp, nil
+}
+
+// GetFolders get folder information
+func (c *NylasClient) GetFolders() (*GetFolersResponse, error) {
+	path := fmt.Sprintf("/v3/grants/%s/folders", c.httpClient.grantID)
+
+	responseBody, err := c.httpClient.doRequest("GET", path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp GetFolersResponse
+	if err := json.Unmarshal(responseBody, &resp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// GetThread get thread information
+func (c *NylasClient) GetThread(threadID string) (*ThreadResponse, error) {
+	path := fmt.Sprintf("/v3/grants/%s/threads/%s", c.httpClient.grantID, threadID)
+
+	responseBody, err := c.httpClient.doRequest("GET", path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var messagesResp ThreadResponse
 	if err := json.Unmarshal(responseBody, &messagesResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
@@ -63,6 +100,9 @@ func (c *NylasClient) GetUnreadMessages(limit int) (*MessagesResponse, error) {
 }
 
 func (c *NylasClient) SendMessage(msg *SendMessageRequest) (*SendMessageResponse, error) {
+
+	// filter out repleis to yourself
+
 	responseBody, err := c.httpClient.doRequest("POST", fmt.Sprintf("/v3/grants/%s/messages/send", c.httpClient.grantID), nil, msg)
 	if err != nil {
 		return nil, err

@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useReadTicketSuspense, useUpdateTicket } from "./clients/tickets/tickets"
-import { TicketStatus, Ticket as TicketModel, TicketPriority} from "./clients/tickets/models"
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Card, CardContent, Chip, CircularProgress, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material"
-import { Suspense, useState } from "react"
+import { TicketStatus, Ticket as TicketModel, TicketPriority} from "./clients/tickets/models"
+import { Box, Card, CardContent, Chip, CircularProgress, Divider, Grid, IconButton, Menu, MenuItem, Popover, TextField, Typography } from "@mui/material"
+import { ChangeEvent, Suspense, useState } from "react"
 // import EdiText from 'react-editext'
 import { Messages } from "./Messages";
 
@@ -53,12 +53,6 @@ const TicketContent = ({id}: {id: number}) => {
     })
 
     handleClose();
-  };
-
-  const [newComment, setNewComment] = useState('');
-
-  const handleCommentSubmit = () => {
-    setNewComment('');
   };
 
   return (
@@ -113,9 +107,7 @@ const TicketContent = ({id}: {id: number}) => {
                 onClose={() => setAnchorPriorityEl(null)}
               />
 
-              <Typography variant="body2" align="right">
-                Assignee: {ticket.assignee || "None"}
-              </Typography>
+              <Assignee ticketId={ticket.id} assignee={ticket.assignee} refetchFn={refetch}/>
               <Typography variant="body2" align="right">
                 Created by: {ticket.created_by?.split("@")[0]}
               </Typography>
@@ -142,22 +134,73 @@ const TicketContent = ({id}: {id: number}) => {
       <Messages threadID={ticket.thread_id}/>
     </Suspense>
     
-    <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-      <TextField
-        fullWidth
-        multiline
-        rows={3}
-        variant="outlined"
-        placeholder="Write a comment..."
-        value={newComment}
-        onChange={(e) => setNewComment(e.target.value)}
-        sx={{ mr: 1 }}
+  </Box>
+  )
+}
+
+type AssigneeProps = {
+  ticketId: number
+  refetchFn: () => void
+  assignee?: string
+}
+
+const Assignee = ({assignee, ticketId, refetchFn}: AssigneeProps) => {
+
+  const [anchor, setAnchor] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchor);
+
+  const [value, setValue] = useState(assignee)
+
+  const {mutate: updateTicket} = useUpdateTicket()
+
+  const handleClose = () => {
+    setAnchor(null)
+    setValue("")
+  }
+
+  return (
+    <div>
+      <Chip
+        label={`Assignee: ${assignee || "None"}`}
+        onClick={(e) => setAnchor(e.currentTarget)}
       />
-      <IconButton color="primary" onClick={handleCommentSubmit}>
-        <SendIcon />
-      </IconButton>
-    </Box>
-    </Box>
+      <Popover 
+        id="simpole-popover"
+        open={open} 
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'right',
+        }}
+
+      >
+        <TextField 
+          id="outlined-basic" 
+          label="Type name" 
+          variant="outlined" 
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            setValue(event.target.value);
+          }}
+        />
+
+        <IconButton color="secondary" onClick={() => {
+          updateTicket({
+            id: ticketId,
+            data: {
+              assignee: value,
+            }
+          },{
+            onSuccess: () => {
+              handleClose()
+              refetchFn()
+            }
+          })
+        }}>
+          <SendIcon />
+        </IconButton>
+
+      </Popover>
+    </div>
   )
 }
 

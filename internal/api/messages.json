@@ -36,7 +36,44 @@
                 }
               }
             }
+          }
+        }
+      },
+      "/threads/reply": {
+        "post": {
+          "summary": "reply to thread",
+          "description": "reply to all users in a thread",
+          "operationId": "replyToThread",
+          "requestBody": {
+            "description": "Message to post to thread",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "thread_id": {
+                      "type": "string"
+                    },
+                    "body": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
 
+          "responses": {
+            "200": {
+              "description": "Message posted",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Message"
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -36,3 +36,12 @@ type Participant struct {
 	Email *string `json:"email,omitempty"`
 	Name  *string `json:"name,omitempty"`
 }
+
+// ReplyToThreadJSONBody defines parameters for ReplyToThread.
+type ReplyToThreadJSONBody struct {
+	Body     *string `json:"body,omitempty"`
+	ThreadId *string `json:"thread_id,omitempty"`
+}
+
+// ReplyToThreadJSONRequestBody defines body for ReplyToThread for application/json ContentType.
+type ReplyToThreadJSONRequestBody ReplyToThreadJSONBody

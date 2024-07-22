@@ -17,9 +17,15 @@ type nylasHTTPClient struct {
 }
 
 func newNylasHTTPClient(baseURL, grantID, apiKey string) *nylasHTTPClient {
+
+	grant := "me"
+	if grantID != "" {
+		grant = grantID
+	}
+
 	return &nylasHTTPClient{
 		baseURL: baseURL,
-		grantID: grantID,
+		grantID: grant,
 		apiKey:  apiKey,
 		client:  &http.Client{},
 	}
@@ -60,7 +66,12 @@ func (c *nylasHTTPClient) doRequest(method, path string, query url.Values, body 
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		responseBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read error response body: %w", err)
+		}
+
+		return nil, fmt.Errorf("unexpected status code: %d, resp: %s", resp.StatusCode, string(responseBody))
 	}
 
 	responseBody, err := io.ReadAll(resp.Body)

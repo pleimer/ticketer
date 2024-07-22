@@ -284,6 +284,9 @@ func (lro *LongRunningOperationsService) SendTicketCreationAcknowledgementActivi
 			req.Initiator,
 		},
 		ReplyToMessageID: req.MessageID,
+		TrackingOptions: &nylas.TrackingOptions{
+			ThreadReplies: true,
+		},
 	})
 	return
 }

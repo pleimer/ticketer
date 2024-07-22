@@ -286,8 +286,7 @@
                       "not_started",
                       "in_progress",
                       "done"
-                    ],
-                    "default": "not_started"
+                    ]
                   },
                   "priority": {
                     "type": "string",
@@ -295,8 +294,7 @@
                       "low",
                       "medium",
                       "high"
-                    ],
-                    "default": "low"
+                    ]
                   },
                   "thread_id": {
                     "type": "string"

@@ -59,7 +59,6 @@ type Attachment struct {
 	Filename    string `json:"filename,omitempty"`
 }
 
-// Response model structs
 type MessagesResponse struct {
 	RequestID  string    `json:"request_id"`
 	Data       []Message `json:"data"`
@@ -112,4 +111,16 @@ type TrackingOptions struct {
 type UpdateMessageResponse struct {
 	RequestID string  `json:"request_id"`
 	Data      Message `json:"data"`
+}
+
+type GetFolersResponse struct {
+	RequestID string   `json:"request_id"`
+	Data      []Folder `json:"data"`
+}
+
+type Folder struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	TotalCount  int    `json:"total_count"`
+	UnreadCount int    `json:"unread_count"`
 }
