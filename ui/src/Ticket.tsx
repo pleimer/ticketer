@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { useReadTicket, useReadTicketSuspense } from "./clients/tickets/tickets"
+import { useReadTicket, useReadTicketSuspense, useUpdateTicket } from "./clients/tickets/tickets"
 import { TicketStatus, Ticket as TicketModel, TicketPriority} from "./clients/tickets/models"
 import { Message as MessageModel} from "./clients/messages/models"
 import SendIcon from '@mui/icons-material/Send';
@@ -24,7 +24,9 @@ export const Ticket = () => {
 }
 
 const TicketContent = ({id}: {id: number}) => {
-  const {data: {data: ticket = {} as TicketModel} = {}, error} =  useReadTicketSuspense(Number(id))
+  const {data: {data: ticket = {} as TicketModel} = {}, error, refetch} =  useReadTicketSuspense(Number(id))
+
+  const {mutate: updateTicket} = useUpdateTicket()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -38,6 +40,12 @@ const TicketContent = ({id}: {id: number}) => {
   };
   
   const handleStatusChange = (newStatus: TicketStatus) => {
+    updateTicket({id: id, data: {
+      status: newStatus,
+    }},{
+      onSuccess: () => refetch(),
+    })
+
     handleClose();
   };
 
