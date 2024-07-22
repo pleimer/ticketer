@@ -28,20 +28,29 @@ const TicketContent = ({id}: {id: number}) => {
 
   const {mutate: updateTicket} = useUpdateTicket()
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [anchorStatusEl, setAnchorStatusEl] = useState<null | HTMLElement>(null);
+  const statusOpen = Boolean(anchorStatusEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const [anchorPriorityEl, setAnchorPriorityEl] = useState<null | HTMLElement>(null);
+  const prioritoryOpen = Boolean(anchorPriorityEl);
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setAnchorStatusEl(null);
   };
   
   const handleStatusChange = (newStatus: TicketStatus) => {
     updateTicket({id: id, data: {
       status: newStatus,
+    }},{
+      onSuccess: () => refetch(),
+    })
+
+    handleClose();
+  };
+
+  const handlePriorityChange = (newStatus: TicketPriority) => {
+    updateTicket({id: id, data: {
+      priority: newStatus,
     }},{
       onSuccess: () => refetch(),
     })
@@ -79,28 +88,34 @@ const TicketContent = ({id}: {id: number}) => {
               <Chip
                 label={`Status: ${ticket.status}`}
                 color="primary"
-                onDelete={handleClick}
+                onDelete={(event: React.MouseEvent<HTMLButtonElement>) => setAnchorStatusEl(event.currentTarget)}
                 deleteIcon={<ArrowDropDownIcon />}
                 sx={{ mb: 1 }}
               />
-              <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-              >
-                {Object.values(TicketStatus).map((status) => (
-                  <MenuItem key={status} onClick={() => handleStatusChange(status)}>
-                    {status}
-                  </MenuItem>
-                ))}
-              </Menu>
+              <AttributeOptions 
+                anchor={anchorStatusEl} 
+                open={statusOpen} 
+                options={TicketStatus} 
+                onSelect={handleStatusChange} 
+                onClose={() => setAnchorStatusEl(null)}
+              />
+
               <Chip 
                 label={`Priority: ${ticket.priority}`} 
                 color={ticket.priority == TicketPriority.high ? "warning": "secondary"} 
-                onDelete={handleClick}
+                onDelete={(event: React.MouseEvent<HTMLButtonElement>) => setAnchorPriorityEl(event.currentTarget)}
                 deleteIcon={<ArrowDropDownIcon />}
                 sx={{ mb: 1}}
               />
+
+              <AttributeOptions 
+                anchor={anchorPriorityEl} 
+                open={prioritoryOpen} 
+                options={TicketPriority} 
+                onSelect={handlePriorityChange} 
+                onClose={() => setAnchorPriorityEl(null)}
+              />
+
               <Typography variant="body2" align="right">
                 Assignee: {ticket.assignee || "None"}
               </Typography>
@@ -149,3 +164,32 @@ const TicketContent = ({id}: {id: number}) => {
   )
 }
 
+type AttributeOptionsProps<T extends { [key: string]: string }> = {
+  anchor: null | HTMLElement,
+  open: boolean,
+  options: T,
+  onClose?: () => void,
+  onSelect?: (option: T[keyof T]) => void,
+}
+
+const AttributeOptions = <T extends { [key: string]: string }>({
+  anchor, 
+  open, 
+  options, 
+  onClose, 
+  onSelect
+}: AttributeOptionsProps<T>) => {
+  return (
+    <Menu
+      anchorEl={anchor}
+      open={open}
+      onClose={onClose}
+    >
+      {(Object.values(options) as T[keyof T][]).map((option) => (
+        <MenuItem key={option} onClick={() => onSelect?.(option)}>
+          {option}
+        </MenuItem>
+      ))}
+    </Menu>
+  )
+}
