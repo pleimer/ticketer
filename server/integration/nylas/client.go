@@ -26,20 +26,22 @@ func NewNylasClient(cfg NylasClientConfig) *NylasClient {
 }
 
 // ListThreadMessages given a threadID, list all messages in the thread
-func (c *NylasClient) ListThreadMessages(threadID string) (*ThreadResponse, error) {
-	path := fmt.Sprintf("/v3/grants/%s/threads/%s", c.httpClient.grantID, threadID)
+func (c *NylasClient) ListThreadMessages(threadID string) (*MessagesResponse, error) {
+	path := fmt.Sprintf("/v3/grants/%s/messages", c.httpClient.grantID)
+	query := url.Values{}
+	query.Set("thread_id", threadID)
 
-	responseBody, err := c.httpClient.doRequest("GET", path, nil, nil)
+	responseBody, err := c.httpClient.doRequest("GET", path, query, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var threadResp ThreadResponse
-	if err := json.Unmarshal(responseBody, &threadResp); err != nil {
+	var messagesResp MessagesResponse
+	if err := json.Unmarshal(responseBody, &messagesResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	return &threadResp, nil
+	return &messagesResp, nil
 }
 
 func (c *NylasClient) GetUnreadMessages(limit int) (*MessagesResponse, error) {

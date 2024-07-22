@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom"
-import { useGetThreadsThreadId } from "./clients/messages/messages"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useReadTicket } from "./clients/tickets/tickets"
 import { TicketStatus, Ticket as TicketModel, TicketPriority} from "./clients/tickets/models"
 import { Message as MessageModel} from "./clients/messages/models"
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Card, CardContent, CardHeader, Chip, Divider, Grid, IconButton, List, ListItem, ListItemText, Menu, MenuItem, TextField, Typography } from "@mui/material"
+import { Box, Card, CardContent, Chip, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material"
 import { useState } from "react"
+import { useListThreadMessages } from "./clients/messages/messages";
 
 export const Ticket = () => {
     const {id} =  useParams()
@@ -24,10 +24,15 @@ export const Ticket = () => {
 
     // useGetThreadsThreadId()
 
+    const {data: {data: messages = [] as MessageModel[]} = {}} = useListThreadMessages(ticket.thread_id, {
+      query: {
+        enabled: !!ticket.thread_id,
+      }
+    })
+
 
     // const ticket = useTicket(id); // Custom hook to fetch ticket details
     // const comments = useComments(ticket?.thread_id) || [];
-    const comments = [] as MessageModel[]
   
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -124,7 +129,7 @@ export const Ticket = () => {
           Comments
         </Typography>
         <Box sx={{ mb: 2 }}>
-          {comments.sort((a, b) => (a.date || 0) - (b.date || 0)).map((message) => (
+          {messages.sort((a, b) => (a.date || 0) - (b.date || 0)).map((message) => (
             <Card key={message.id} sx={{ mb: 2 }}>
               <CardContent>
                 <Typography variant="subtitle1">

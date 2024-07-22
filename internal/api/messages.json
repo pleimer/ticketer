@@ -8,8 +8,9 @@
     "paths": {
       "/threads/{threadId}": {
         "get": {
-          "summary": "Get Thread",
-          "description": "Retrieve information about a specific thread",
+          "summary": "List Thread Messages",
+          "operationId": "listThreadMessages",
+          "description": "Retrieve messages in specific thread",
           "parameters": [
             {
               "name": "threadId",
@@ -23,15 +24,19 @@
           ],
           "responses": {
             "200": {
-              "description": "Successful response",
+              "description": "result Messsage list",
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/ThreadResponse"
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Message"
+                    }
                   }
                 }
               }
             }
+
           }
         }
       }

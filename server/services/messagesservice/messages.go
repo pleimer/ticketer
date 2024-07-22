@@ -27,7 +27,7 @@ func NewMessagesService(logger *zap.Logger, nylasCli *nylas.NylasClient) *Messag
 
 // Get messages in Thread
 // (GET threads/{threadId})
-func (t *MessagesService) GetThreadsThreadId(ctx echo.Context, threadId string) error {
+func (t *MessagesService) ListThreadMessages(ctx echo.Context, threadId string) error {
 
 	// TODO: paging
 	r, err := t.nylasCli.ListThreadMessages(threadId)
@@ -36,14 +36,12 @@ func (t *MessagesService) GetThreadsThreadId(ctx echo.Context, threadId string) 
 		return echo.NewHTTPError(http.StatusInternalServerError, "connecting to email server")
 	}
 
-	reply := ThreadResponse{}
-	err = copier.Copy(&reply, r)
+	reply := []Message{}
+	err = copier.Copy(&reply, r.Data)
 	if err != nil {
 		// dev error
 		t.Fatal("mismatched structs")
 	}
-
-	// TODO: call ListMessages nylas API for message objects
 
 	return ctx.JSON(http.StatusOK, reply)
 }
