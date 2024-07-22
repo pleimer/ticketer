@@ -110,7 +110,7 @@ export const Ticket = () => {
         </Card>
   
         <Typography variant="h5" gutterBottom>
-          Comments
+          Messages
         </Typography>
         <Box sx={{ mb: 2 }}>
           {messages.sort((a, b) => (a.date || 0) - (b.date || 0)).map((message) => (
@@ -124,7 +124,7 @@ export const Ticket = () => {
                 </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Typography variant="body1">
-                  {message.body || 'No content'}
+                  {message.snippet || 'No content'}
                 </Typography>
               </CardContent>
             </Card>
