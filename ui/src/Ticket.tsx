@@ -1,12 +1,11 @@
 import { useParams } from "react-router-dom"
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { useReadTicket, useReadTicketSuspense, useUpdateTicket } from "./clients/tickets/tickets"
+import { useReadTicketSuspense, useUpdateTicket } from "./clients/tickets/tickets"
 import { TicketStatus, Ticket as TicketModel, TicketPriority} from "./clients/tickets/models"
-import { Message as MessageModel} from "./clients/messages/models"
 import SendIcon from '@mui/icons-material/Send';
 import { Box, Card, CardContent, Chip, CircularProgress, Divider, Grid, IconButton, Menu, MenuItem, TextField, Typography } from "@mui/material"
 import { Suspense, useState } from "react"
-import { useListThreadMessages } from "./clients/messages/messages";
+// import EdiText from 'react-editext'
 import { Messages } from "./Messages";
 
 export const Ticket = () => {
@@ -15,11 +14,9 @@ export const Ticket = () => {
     // ticket information
 
     return (
-        <Box sx={{ maxWidth: 1000, margin: 'auto', padding: 2 }}>
           <Suspense fallback={<CircularProgress color="primary" />}>
             <TicketContent id={Number(id)}/>
           </Suspense>
-        </Box>
     );
 }
 
@@ -67,7 +64,7 @@ const TicketContent = ({id}: {id: number}) => {
   return (
     error ? "error fetching ticket data" :
     // TODO: error boundaries
-    <>
+    <Box sx={{ maxWidth: 1000, margin: 'auto', padding: 2 }}>
     <Card sx={{ mb: 4 }}>
       <CardContent>
         <Typography variant="h4" gutterBottom>
@@ -116,9 +113,14 @@ const TicketContent = ({id}: {id: number}) => {
                 onClose={() => setAnchorPriorityEl(null)}
               />
 
-              <Typography variant="body2" align="right">
-                Assignee: {ticket.assignee || "None"}
-              </Typography>
+              {/* <Typography variant="body2" align="right"> */}
+                {/* Assignee:  */}
+                {/* <EdiText
+                  type="text" 
+                  value={ticket.assignee || "None"}
+                  onSave={() => {}}
+                /> */}
+              {/* </Typography> */}
               <Typography variant="body2" align="right">
                 Created by: {ticket.created_by?.split("@")[0]}
               </Typography>
@@ -160,7 +162,7 @@ const TicketContent = ({id}: {id: number}) => {
         <SendIcon />
       </IconButton>
     </Box>
-    </>
+    </Box>
   )
 }
 

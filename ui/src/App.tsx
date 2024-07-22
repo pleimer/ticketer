@@ -1,10 +1,6 @@
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import { useListTicket } from "./clients/tickets/tickets";
 import { ListTicketStatus } from "./clients/tickets/models/listTicketStatus";
-import { Button, ButtonGroup } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import TicketList from "./TicketList";
 
 
