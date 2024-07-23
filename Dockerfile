@@ -4,6 +4,8 @@ FROM golang:1.22-alpine AS server_builder
 WORKDIR /app
 COPY . .
 RUN cd server && go mod download
+# codegen
+RUN go generate ./server/... 
 RUN go build -o ticketer ./server
 
 # UI Builder
@@ -12,6 +14,7 @@ WORKDIR /app
 
 COPY ui ./ui
 RUN yarn --cwd ui install
+RUN npx orval --config ./ui/orval.config.ts
 RUN yarn --cwd ui build --outDir ./build/ticketer
 
 # Start a new stage from scratch
