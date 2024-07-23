@@ -14,6 +14,7 @@ WORKDIR /app
 
 COPY ui ./ui
 RUN yarn --cwd ui install
+RUN ls ui
 RUN npx orval --config ./ui/orval.config.ts
 RUN yarn --cwd ui build --outDir ./build/ticketer
 
