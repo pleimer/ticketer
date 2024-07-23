@@ -3,6 +3,10 @@ A simple ticket management tool
 
 This service watches for updates coming into an email inbox configured with Nylas in a temporal workflow. Messages that begin a new thread will result in a new ticket being created. 
 
+Two pages:
+1. localhost:8080 - ticket list view shows all tickets with a 'in_progress' or 'not_started' status
+2. localhost:8080/ticket/:id - view and update tickets/message threads
+
 For this project, no thread or message information is stored in the application DB. Rather, all messaging state is queried from the mail server. This does make for some fragile interations such as replying to a thread through the UI. This can be improved by putting this operation in a temporal workflow of its own, making adjustments for transactionality and even tracking some messageing/threading data in the application db.
 
 # Run locally
@@ -25,10 +29,10 @@ docker compose up -d
 
 4. Visit `localhost:8080`
 
-# Creating Tickets
+# Usage
 
 Tickets are created when a new email arrives in the inbox of the account configured with Nylas. To open a ticket,
-send a message to the address with an alternate email. After 60s, a new ticket will be created and a notification sent to the originator.
+send a message to the address with an alternate email. After 60s, a new ticket will be created and a notification sent to the originator (you will need to refresh the page or follow the link in the email notification).
 
 Messages can be added to the ticket by replying to the email thread created for the ticket.
 
