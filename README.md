@@ -9,6 +9,8 @@ Two pages:
 
 For this project, no thread or message information is stored in the application DB. Rather, all messaging state is queried from the mail server. This does make for some fragile interations such as replying to a thread through the UI. This can be improved by putting this operation in a temporal workflow of its own, making adjustments for transactionality and even tracking some messageing/threading data in the application db.
 
+This project has only been tested with an `outlook.com` account. Minor difference with IMAP and Gmail may cause incompatabilities.
+
 # Run locally
 
 1. Copy the sample `env` file

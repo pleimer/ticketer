@@ -102,5 +102,5 @@ func (t *MessagesService) ReplyToThread(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "submitting reply")
 	}
 
-	return ctx.JSON(http.StatusOK, r)
+	return ctx.JSON(http.StatusOK, r.Data)
 }
