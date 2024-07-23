@@ -1,7 +1,7 @@
 # Ticketer
 A simple ticket management tool
 
-This service watches for updates coming into an email inbox configured with Nylas in a temporal workflow. Messages that begin a new thread will result in a new ticket being created. 
+This service watches for updates coming into an email inbox configured with Nylas in a temporal workflow. Messages that begin a new thread will result in a new ticket being created and messages that reply to a thread will become a comment on the ticket.
 
 Two pages:
 1. localhost:8080 - ticket list view shows all tickets with a 'in_progress' or 'not_started' status
