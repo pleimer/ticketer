@@ -1,0 +1,67 @@
+version: "4"
+
+services:
+  postgres:
+    logging:
+      driver: "none"
+    image: matthieuberger/postgres-multi-db:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./tmp/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=ticketerdb
+
+  temporal:
+    logging:
+      driver: "none"
+    restart: on-failure:3 
+    build:
+      context: ./infra/temporal
+      dockerfile: Dockerfile
+    ports:
+      - 7233:7233
+      - 8233:8233
+    volumes:
+      - ./tmp/temporal:/usr/temporal/
+
+  # API service
+  # api: ...
+  webserver:
+    restart: on-failure:3
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      NYLAS_CLIENT_ID: "${NYLAS_CLIENT_ID}"
+      NYLAS_API_KEY: "${NYLAS_API_KEY}"
+      NYLAS_API_URI: "https://api.us.nylas.com"
+      NYLAS_GRANT_ID: "${NYLAS_GRANT_ID}"
+      TICKETER_TEMPORAL_HOST_PORT: "temporal:7233"
+      TICKETER_DB_HOST: postgres
+      TICKETER_DB_USER: postgres
+      TICKETER_DB_PASSWORD: password
+
+  # Email worker service
+  # email-worker:...
+  worker:
+    restart: on-failure:3
+    image: ticketer-webserver:latest
+    command: ./server/ticketer run-worker
+    environment:
+      NYLAS_CLIENT_ID: "${NYLAS_CLIENT_ID}"
+      NYLAS_API_KEY: "${NYLAS_API_KEY}"
+      NYLAS_API_URI: "https://api.us.nylas.com"
+      NYLAS_GRANT_ID: "${NYLAS_GRANT_ID}"
+      TICKETER_TEMPORAL_HOST_PORT: "temporal:7233"
+      TICKETER_DB_HOST: postgres
+      TICKETER_DB_USER: postgres
+      TICKETER_DB_PASSWORD: password
+
+networks:
+  default:
+    driver: bridge
+    name: mentium-net

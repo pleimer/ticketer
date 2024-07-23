@@ -4,12 +4,14 @@ import (
 	"github.com/pleimer/ticketer/server/db"
 	"github.com/pleimer/ticketer/server/env"
 	"github.com/pleimer/ticketer/server/integration/nylas"
+	"github.com/pleimer/ticketer/server/services/ticketsservice"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 	"go.uber.org/zap"
 )
 
 type RunWorker struct {
+	ticketsservice.TemporalConfig
 	db.DBConnectionConfig
 	nylas.NylasClientConfig
 }
@@ -23,8 +25,11 @@ func (r *RunWorker) Execute(args []string) error {
 	// For this project, since there is only one environment, will just apply configurations here
 	app.NylasClientConfig = r.NylasClientConfig
 	app.DBConnectionConfig = r.DBConnectionConfig
+	app.TemporalConfig = r.TemporalConfig
 
-	c, err := client.Dial(client.Options{})
+	c, err := client.Dial(client.Options{
+		HostPort: r.TemporalConfig.HostPort,
+	})
 	if err != nil {
 		app.Logger().Sugar().Fatalf("Unable to create Temporal client.", err)
 	}

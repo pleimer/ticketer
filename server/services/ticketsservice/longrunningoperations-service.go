@@ -20,6 +20,10 @@ import (
 
 var ingestorWorkflowID = "email-ingestor-workflow"
 
+type TemporalConfig struct {
+	HostPort string `long:"temporal-host-port" env:"TICKETER_TEMPORAL_HOST_PORT" default:"localhost" description:"Temporal host port"`
+}
+
 // TODO: just make this part of the tickets service
 type LongRunningOperationsService struct {
 	client      client.Client
@@ -30,8 +34,10 @@ type LongRunningOperationsService struct {
 	logger *zap.Logger
 }
 
-func NewLongRunningOperationsService(logger *zap.Logger, nylas *nylas.NylasClient, db *db.DB, ticketsRepo *repositories.TicketsRepository) *LongRunningOperationsService {
-	temporalClient, err := client.Dial(client.Options{})
+func NewLongRunningOperationsService(config TemporalConfig, logger *zap.Logger, nylas *nylas.NylasClient, db *db.DB, ticketsRepo *repositories.TicketsRepository) *LongRunningOperationsService {
+	temporalClient, err := client.Dial(client.Options{
+		HostPort: config.HostPort,
+	})
 	if err != nil {
 		logger.Fatal("dialing temporal cluster", zap.Error(err))
 	}

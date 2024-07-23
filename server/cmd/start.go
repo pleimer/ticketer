@@ -9,10 +9,12 @@ import (
 	"github.com/pleimer/ticketer/server/db"
 	"github.com/pleimer/ticketer/server/env"
 	"github.com/pleimer/ticketer/server/integration/nylas"
+	"github.com/pleimer/ticketer/server/services/ticketsservice"
 	"go.uber.org/zap"
 )
 
 type Start struct {
+	ticketsservice.TemporalConfig
 	db.DBConnectionConfig
 	nylas.NylasClientConfig
 }
@@ -25,6 +27,7 @@ func (s *Start) Execute(args []string) error {
 	// For this project, since there is only one environment, will just apply configurations here
 	app.NylasClientConfig = s.NylasClientConfig
 	app.DBConnectionConfig = s.DBConnectionConfig
+	app.TemporalConfig = s.TemporalConfig
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)

@@ -12,7 +12,7 @@ import (
 
 type NylasClientConfig struct {
 	ClientID string `long:"client-id" env:"NYLAS_CLIENT_ID" description:"Nylas client ID" required:"true"`
-	GrantID  string `long:"grant-id"   env:"NYLAS_GRANT_ID" description:"Nylas Grant ID for Ticketer Admin Account" required:"true"`
+	GrantID  string `long:"grant-id"   env:"NYLAS_GRANT_ID" default:"me" description:"Nylas Grant ID for Ticketer Admin Account"`
 	APIKey   string `long:"api-key"   env:"NYLAS_API_KEY" description:"Nylas API key" required:"true"`
 	APIURI   string `long:"api-uri"   env:"NYLAS_API_URI" description:"Nylas API URI" required:"true"`
 }

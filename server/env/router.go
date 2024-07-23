@@ -68,7 +68,18 @@ func (r *routerConfig) init(loggerConfig *loggerConfig, servicesConfig *services
 			ticketsservice.RegisterHandlers(tickets, servicesConfig.TicketsService())
 			messagesservice.RegisterHandlers(messages, servicesConfig.ThreadsService())
 
-			r.router.Use(echomiddleware.Static("/opt/ticketer/"))
+			r.router.Use(echomiddleware.StaticWithConfig(echomiddleware.StaticConfig{
+				Skipper: nil,
+				Root:    "./ui/build/ticketer/",
+				// Index file for serving a directory.
+				// Optional. Default value "index.html".
+				Index: "index.html",
+				// Enable HTML5 mode by forwarding all not-found requests to root so that
+				// SPA (single-page application) can handle the routing.
+				HTML5:      true,
+				IgnoreBase: false,
+				Filesystem: nil,
+			}))
 		})
 		return r.router
 	}

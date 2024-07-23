@@ -18,14 +18,9 @@ type nylasHTTPClient struct {
 
 func newNylasHTTPClient(baseURL, grantID, apiKey string) *nylasHTTPClient {
 
-	grant := "me"
-	if grantID != "" {
-		grant = grantID
-	}
-
 	return &nylasHTTPClient{
 		baseURL: baseURL,
-		grantID: grant,
+		grantID: grantID,
 		apiKey:  apiKey,
 		client:  &http.Client{},
 	}

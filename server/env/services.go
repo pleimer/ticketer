@@ -7,6 +7,8 @@ import (
 )
 
 type servicesConfig struct {
+	TemporalConfig ticketsservice.TemporalConfig
+
 	threadsService *messagesservice.MessagesService
 	ThreadsService func() *messagesservice.MessagesService
 
@@ -34,7 +36,7 @@ func (s *servicesConfig) init(loggerConfig *loggerConfig, repositoriesConfig *re
 
 	s.LongRunningOperationsService = func() *ticketsservice.LongRunningOperationsService {
 		once.Once(func() {
-			s.longRunningOperationsService = ticketsservice.NewLongRunningOperationsService(loggerConfig.Logger(), integrationsConfig.NylasClient(), dbConfig.DB(), repositoriesConfig.TicketsRepository())
+			s.longRunningOperationsService = ticketsservice.NewLongRunningOperationsService(s.TemporalConfig, loggerConfig.Logger(), integrationsConfig.NylasClient(), dbConfig.DB(), repositoriesConfig.TicketsRepository())
 		})
 		return s.longRunningOperationsService
 	}
