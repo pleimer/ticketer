@@ -1,7 +1,7 @@
-import { useListTicket } from "./clients/tickets/tickets";
-import { ListTicketStatus } from "./clients/tickets/models/listTicketStatus";
 import { useNavigate} from "react-router-dom";
 import TicketList from "./TicketList";
+import { useListTicket} from "./clients/tickets/tickets";
+import { Status } from "./clients/tickets/models/status";
 
 
 
@@ -9,7 +9,7 @@ export default function App() {
 
   // TODO: api should be adjusted to allow batch querying
   const {data: tickets} = useListTicket({
-    'status[]': [ListTicketStatus.not_started, ListTicketStatus.in_progress],
+    'status[]': [Status.not_started, Status.in_progress],
   })
 
   const nav = useNavigate()

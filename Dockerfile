@@ -13,12 +13,12 @@ FROM node:22 AS ui_builder
 WORKDIR /app
 
 COPY ui ./ui
+COPY internal ./internal
 RUN yarn --cwd ui install
-RUN ls ui
 RUN npx orval --config ./ui/orval.config.ts
 RUN yarn --cwd ui build --outDir ./build/ticketer
 
-# Start a new stage from scratch
+# Build final image
 FROM alpine:latest  
 WORKDIR /app/
 COPY --from=server_builder /app/ticketer ./server/ticketer
