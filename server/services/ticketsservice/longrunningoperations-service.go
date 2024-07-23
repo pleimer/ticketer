@@ -78,10 +78,11 @@ func (lro *LongRunningOperationsService) Close() {
 	// of the server still running or data should still be processed and stored
 	// even if the servers go down. For production, a more detailed plan must be
 	// created for managing workflows
-	err := lro.client.CancelWorkflow(context.Background(), ingestorWorkflowID, "")
-	if err != nil {
-		lro.logger.Error("cancelling ingestor ingestor workflow", zap.Error(err))
-	}
+
+	// err := lro.client.CancelWorkflow(context.Background(), ingestorWorkflowID, "")
+	// if err != nil {
+	// 	lro.logger.Error("cancelling ingestor ingestor workflow", zap.Error(err))
+	// }
 	lro.client.Close()
 }
 
