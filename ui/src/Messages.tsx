@@ -1,10 +1,9 @@
 import { Box, Card, CardContent, Divider, IconButton, TextField, Typography } from "@mui/material"
 import { Message } from "./clients/messages/models"
-import { getListThreadMessagesQueryKey, getListThreadMessagesSuspenseQueryOptions, useListThreadMessagesSuspense, useReplyToThread } from "./clients/messages/messages"
+import { useListThreadMessagesSuspense, useReplyToThread } from "./clients/messages/messages"
 import SendIcon from '@mui/icons-material/Send';
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { AxiosResponse } from "axios";
+// import { useQueryClient } from "@tanstack/react-query";
 
 type MessagesProps = {
     threadID: string
@@ -17,7 +16,7 @@ export const Messages = ({threadID}: MessagesProps) => {
 
     const {mutate: replyToThread} = useReplyToThread()
 
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
 
     const [sending, setSending] = useState(false)
 
@@ -30,7 +29,7 @@ export const Messages = ({threadID}: MessagesProps) => {
           body: newComment,
         }
       },{
-        onSuccess: (r: any) => {
+        onSuccess: () => {
           setNewComment('');
           // const qKey = getListThreadMessagesQueryKey(threadID)
 

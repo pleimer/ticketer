@@ -41,3 +41,6 @@ infra/tmp
 
 # secrets
 .env
+
+# build
+ui/build

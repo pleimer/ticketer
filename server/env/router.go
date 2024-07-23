@@ -67,6 +67,8 @@ func (r *routerConfig) init(loggerConfig *loggerConfig, servicesConfig *services
 
 			ticketsservice.RegisterHandlers(tickets, servicesConfig.TicketsService())
 			messagesservice.RegisterHandlers(messages, servicesConfig.ThreadsService())
+
+			r.router.Use(echomiddleware.Static("/opt/ticketer/"))
 		})
 		return r.router
 	}

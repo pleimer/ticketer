@@ -3,6 +3,9 @@ all: build
 build: 
 	go build -o ticketer ./server
 
+build-ui: 
+	yarn --cwd ui build --outDir ./build/ticketer
+
 # dev
 run-local: 
 	source .env && go run ./server start
